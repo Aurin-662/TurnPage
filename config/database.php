@@ -127,6 +127,7 @@ return [
             'prefix_schema'  => env('DB_SCHEMA', ''),
             'edition'        => env('DB_EDITION', 'ora$base'),
             'server'         => env('DB_SERVER', 'POOLED'),
+            'tns'   => env('DB_TNS', ''),
         ],
 
     ],
