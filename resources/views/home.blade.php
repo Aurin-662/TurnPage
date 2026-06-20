@@ -60,8 +60,16 @@
             <div class="ms-auto">
                 <a class="nav-link d-inline" href="{{ route('home') }}">Home</a>
                 <a class="nav-link d-inline" href="{{ route('books.index') }}">All Books</a>
-                <a class="nav-link d-inline" href="#">Login</a>
-            </div>
+            @if(session('user_id'))
+                <span class="nav-link d-inline">Hi, {{ session('user_name') }}</span>
+                    <form action="{{ route('logout') }}" method="POST" class="d-inline">
+                              @csrf
+                         <button type="submit" class="btn btn-sm btn-outline-light">Logout</button>
+                     </form>
+            @else
+                 <a class="nav-link d-inline" href="{{ route('login') }}">Login</a>
+            @endif            
+             </div>
         </div>
     </nav>
 
