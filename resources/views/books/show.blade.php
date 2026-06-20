@@ -38,7 +38,10 @@
                 <p>Pages: {{ $book->page_count }}</p>
                 <p>ISBN: {{ $book->isbn }}</p>
 
-                <button class="btn btn-danger mt-3">Add to Cart</button>
+                <form action="{{ route('cart.add', $book->book_id) }}" method="POST">
+                                @csrf
+                        <button type="submit" class="btn btn-danger mt-3">Add to Cart</button>
+                </form>
             </div>
         </div>
     </div>
