@@ -79,8 +79,7 @@
                         <span>Total</span>
                         <span>Tk. {{ number_format($total, 2) }}</span>
                     </div>
-                    <button class="btn btn-danger w-100">Proceed to Checkout</button>
-                </div>
+                    <a href="{{ route('checkout.show') }}" class="btn btn-danger w-100">Proceed to Checkout</a>
             </div>
         </div>
         @else
