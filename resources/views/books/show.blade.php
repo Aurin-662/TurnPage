@@ -42,6 +42,57 @@
                                 @csrf
                         <button type="submit" class="btn btn-danger mt-3">Add to Cart</button>
                 </form>
+
+                <hr class="mt-5">
+
+        <h4 class="mt-4">Customer Reviews</h4>
+
+        @if(session('success'))
+            <div class="alert alert-success">{{ session('success') }}</div>
+        @endif
+        @if(session('error'))
+            <div class="alert alert-danger">{{ session('error') }}</div>
+        @endif
+
+        <!-- Write a Review Form -->
+        <div class="card p-4 mb-4 mt-3">
+            <h6>Write a Review</h6>
+            <form action="{{ route('review.store', $book->book_id) }}" method="POST">
+                @csrf
+                <div class="mb-2">
+                    <label class="form-label">Rating</label>
+                    <select name="rating" class="form-select" style="max-width: 150px;" required>
+                        <option value="5">5 - Excellent</option>
+                        <option value="4">4 - Good</option>
+                        <option value="3">3 - Average</option>
+                        <option value="2">2 - Poor</option>
+                        <option value="1">1 - Terrible</option>
+                    </select>
+                </div>
+                <div class="mb-2">
+                    <label class="form-label">Your Review</label>
+                    <textarea name="review_text" class="form-control" rows="3" placeholder="Share your thoughts about this book..."></textarea>
+                </div>
+                <button type="submit" class="btn btn-dark">Submit Review</button>
+            </form>
+        </div>
+
+        <!-- All Reviews -->
+        @forelse($reviews as $review)
+        <div class="border-bottom pb-3 mb-3">
+            <strong>{{ $review->user->name ?? 'Anonymous' }}</strong>
+            <span class="star-rating">
+                @for($i = 1; $i <= 5; $i++)
+                    {{ $i <= $review->rating ? '★' : '☆' }}
+                @endfor
+            </span>
+            <p class="mb-1 text-muted small">{{ \Carbon\Carbon::parse($review->review_date)->format('d M Y') }}</p>
+            <p>{{ $review->review_text }}</p>
+        </div>
+        @empty
+        <p class="text-muted">No reviews yet. Be the first to review this book!</p>
+        @endforelse
+
             </div>
         </div>
     </div>

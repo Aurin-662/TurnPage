@@ -6,6 +6,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\ReviewController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
@@ -30,3 +31,6 @@ Route::put('/cart/update/{cartItemId}', [CartController::class, 'updateQuantity'
 Route::get('/checkout', [CheckoutController::class, 'show'])->name('checkout.show');
 Route::post('/checkout/place-order', [CheckoutController::class, 'placeOrder'])->name('checkout.place');
 Route::get('/orders', [CheckoutController::class, 'history'])->name('orders.history');
+
+
+Route::post('/books/{bookId}/review', [ReviewController::class, 'store'])->name('review.store');

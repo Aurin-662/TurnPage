@@ -17,4 +17,10 @@ class OrderItem extends Model
     {
         return $this->belongsTo(Book::class, 'book_id', 'book_id');
     }
+    
+    public function order()
+{
+    return $this->belongsTo(Order::class, 'order_id', 'order_id');
+}
+
 }

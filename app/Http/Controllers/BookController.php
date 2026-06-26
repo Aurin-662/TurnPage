@@ -58,9 +58,16 @@ class BookController extends Controller
         return view('books.index', compact('books'));
     }
 
-    public function show($id)
+    /*public function show($id)
     {
         $book = Book::with('author', 'publisher')->findOrFail($id);
         return view('books.show', compact('book'));
-    }
+    }*/
+
+    public function show($id)
+{
+    $book = Book::with('author', 'publisher')->findOrFail($id);
+    $reviews = \App\Models\Review::with('user')->where('book_id', $id)->orderBy('review_date', 'desc')->get();
+    return view('books.show', compact('book', 'reviews'));
+}
 }
