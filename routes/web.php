@@ -8,6 +8,9 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\WishlistController;
+use App\Http\Controllers\Admin\BookController as AdminBookController;
+use App\Http\Controllers\Admin\AuthorController as AdminAuthorController;
+use App\Http\Controllers\Admin\PublisherController as AdminPublisherController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
@@ -40,3 +43,18 @@ Route::post('/books/{bookId}/review', [ReviewController::class, 'store'])->name(
 Route::post('/wishlist/add/{bookId}', [WishlistController::class, 'add'])->name('wishlist.add');
 Route::get('/wishlist', [WishlistController::class, 'view'])->name('wishlist.view');
 Route::delete('/wishlist/remove/{wishlistId}', [WishlistController::class, 'remove'])->name('wishlist.remove');
+
+
+Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/books', [AdminBookController::class, 'index'])->name('books.index');
+    Route::get('/books/create', [AdminBookController::class, 'create'])->name('books.create');
+    Route::post('/books', [AdminBookController::class, 'store'])->name('books.store');
+    Route::get('/books/{id}/edit', [AdminBookController::class, 'edit'])->name('books.edit');
+    Route::put('/books/{id}', [AdminBookController::class, 'update'])->name('books.update');
+    Route::delete('/books/{id}', [AdminBookController::class, 'destroy'])->name('books.destroy');
+
+    Route::post('/authors/quick-add', [AdminAuthorController::class, 'quickAdd'])->name('authors.quickadd');
+    Route::post('/publishers/quick-add', [AdminPublisherController::class, 'quickAdd'])->name('publishers.quickadd');
+});
+
+
