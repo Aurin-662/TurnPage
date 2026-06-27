@@ -9,6 +9,8 @@
         .navbar { background-color: #1a1a2e; }
         .navbar-brand { color: #fff !important; font-weight: bold; }
         .table-card { background: #fff; border-radius: 10px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
+        .nav-link { color: #ecf0f1 !important; margin-left: 10px; }
+        .nav-link:hover { color: #f39c12 !important; }
     </style>
 </head>
 <body>
@@ -16,6 +18,7 @@
     <nav class="navbar navbar-expand-lg">
         <div class="container">
             <a class="navbar-brand" href="{{ route('admin.books.index') }}">⚙️ TurnPage Admin</a>
+            <a class="nav-link d-inline" href="{{ route('admin.orders.index') }}" style="color: #ecf0f1;">Orders</a>
             <a href="{{ route('home') }}" class="btn btn-sm btn-outline-light">Back to Site</a>
         </div>
     </nav>

@@ -61,11 +61,15 @@
                 <a class="nav-link d-inline" href="{{ route('home') }}">Home</a>
                 <a class="nav-link d-inline" href="{{ route('books.index') }}">All Books</a>
                 <a class="nav-link d-inline" href="{{ route('cart.view') }}">🛒 Cart</a>
+                <a class="nav-link d-inline" href="{{ route('orders.history') }}">📦 My Orders</a>
                 
             @if(session('user_id'))
                 <span class="nav-link d-inline">Hi, {{ session('user_name') }}</span>
                     <form action="{{ route('logout') }}" method="POST" class="d-inline">
                               @csrf
+                            @if(session('user_role') === 'admin')
+    <a class="nav-link d-inline" href="{{ route('admin.books.index') }}">⚙️ Admin Panel</a>
+@endif
                          <button type="submit" class="btn btn-sm btn-outline-light">Logout</button>
                      </form>
             @else
