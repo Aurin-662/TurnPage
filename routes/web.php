@@ -7,6 +7,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\WishlistController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
@@ -34,3 +35,8 @@ Route::get('/orders', [CheckoutController::class, 'history'])->name('orders.hist
 
 
 Route::post('/books/{bookId}/review', [ReviewController::class, 'store'])->name('review.store');
+
+
+Route::post('/wishlist/add/{bookId}', [WishlistController::class, 'add'])->name('wishlist.add');
+Route::get('/wishlist', [WishlistController::class, 'view'])->name('wishlist.view');
+Route::delete('/wishlist/remove/{wishlistId}', [WishlistController::class, 'remove'])->name('wishlist.remove');

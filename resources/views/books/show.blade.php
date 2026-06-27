@@ -43,16 +43,21 @@
                         <button type="submit" class="btn btn-danger mt-3">Add to Cart</button>
                 </form>
 
+                <form action="{{ route('wishlist.add', $book->book_id) }}" method="POST" class="d-inline">
+                       @csrf
+                        <button type="submit" class="btn btn-outline-danger mt-3">❤️ Add to Wishlist</button>
+                </form>
+
                 <hr class="mt-5">
 
-        <h4 class="mt-4">Customer Reviews</h4>
+                 <h4 class="mt-4">Customer Reviews</h4>
 
-        @if(session('success'))
-            <div class="alert alert-success">{{ session('success') }}</div>
-        @endif
-        @if(session('error'))
-            <div class="alert alert-danger">{{ session('error') }}</div>
-        @endif
+                   @if(session('success'))
+                   <div class="alert alert-success">{{ session('success') }}</div>
+                  @endif
+                @if(session('error'))
+                <div class="alert alert-danger">{{ session('error') }}</div>
+                @endif
 
         <!-- Write a Review Form -->
         <div class="card p-4 mb-4 mt-3">
