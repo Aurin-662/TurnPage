@@ -63,3 +63,7 @@ Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
 });
 
 
+Route::post('/checkout/apply-voucher', [CheckoutController::class, 'applyVoucher'])->name('checkout.applyVoucher');
+Route::post('/checkout/remove-voucher', [CheckoutController::class, 'removeVoucher'])->name('checkout.removeVoucher');
+
+

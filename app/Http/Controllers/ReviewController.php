@@ -28,7 +28,7 @@ class ReviewController extends Controller
             return back()->with('error', 'You have already reviewed this book.');
         }
 
-        // Optional: Verify the user has actually purchased this book
+        //  Verify the user has actually purchased this book
         $hasPurchased = OrderItem::where('book_id', $bookId)
             ->whereHas('order', function ($q) use ($userId) {
                 $q->where('user_id', $userId);

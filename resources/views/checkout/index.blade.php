@@ -23,7 +23,9 @@
         <h2 class="mb-4">Checkout</h2>
 
         <div class="row">
+            <!-- LEFT COLUMN: Order Items + Voucher -->
             <div class="col-md-7">
+
                 <div class="summary-box mb-4">
                     <h5>Order Items</h5>
                     <hr>
@@ -34,13 +36,55 @@
                     </div>
                     @endforeach
                     <hr>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Subtotal</span>
+                        <span>Tk. {{ number_format($subtotal, 2) }}</span>
+                    </div>
+                    @if($discount > 0)
+                    <div class="d-flex justify-content-between mb-2 text-success">
+                        <span>Discount ({{ $appliedVoucher->voucher_code }})</span>
+                        <span>- Tk. {{ number_format($discount, 2) }}</span>
+                    </div>
+                    @endif
+                    <hr>
                     <div class="d-flex justify-content-between fw-bold">
                         <span>Total</span>
                         <span>Tk. {{ number_format($total, 2) }}</span>
                     </div>
                 </div>
+
+                <div class="summary-box">
+                    <h5>Have a Voucher?</h5>
+                    <hr>
+
+                    @if(session('success'))
+                        <div class="alert alert-success py-2">{{ session('success') }}</div>
+                    @endif
+                    @if(session('error'))
+                        <div class="alert alert-danger py-2">{{ session('error') }}</div>
+                    @endif
+
+                    @if($appliedVoucher)
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>Applied: <strong>{{ $appliedVoucher->voucher_code }}</strong> ({{ $appliedVoucher->discount_percent }}% off)</span>
+                            <form action="{{ route('checkout.removeVoucher') }}" method="POST">
+                                @csrf
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Remove</button>
+                            </form>
+                        </div>
+                    @else
+                        <form action="{{ route('checkout.applyVoucher') }}" method="POST" class="d-flex gap-2">
+                            @csrf
+                            <input type="text" name="voucher_code" class="form-control" placeholder="Enter voucher code">
+                            <button type="submit" class="btn btn-dark">Apply</button>
+                        </form>
+                        <p class="text-muted small mt-2 mb-0">Try: WELCOME10, BOOKLOVER20, EIDOFFER</p>
+                    @endif
+                </div>
+
             </div>
 
+            <!-- RIGHT COLUMN: Payment Method -->
             <div class="col-md-5">
                 <div class="summary-box">
                     <h5>Payment Method</h5>
