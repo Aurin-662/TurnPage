@@ -25,6 +25,7 @@
             <div class="ms-auto">
                 <a class="nav-link d-inline" href="{{ route('admin.books.index') }}">Books</a>
                 <a class="nav-link d-inline" href="{{ route('admin.orders.index') }}">Orders</a>
+                <a class="nav-link d-inline" href="{{ route('admin.vouchers.index') }}">Vouchers</a>
                 <a href="{{ route('home') }}" class="btn btn-sm btn-outline-light">Back to Site</a>
             </div>
         </div>
