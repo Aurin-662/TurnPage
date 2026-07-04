@@ -17,7 +17,9 @@
 
     <nav class="navbar navbar-expand-lg">
         <div class="container">
+            
             <a class="navbar-brand" href="{{ route('admin.books.index') }}">⚙️ TurnPage Admin</a>
+            <a class="nav-link d-inline" href="{{ route('admin.dashboard') }}">Dashboard</a>
             <a class="nav-link d-inline" href="{{ route('admin.orders.index') }}" style="color: #ecf0f1;">Orders</a>
             <a class="nav-link d-inline" href="{{ route('admin.vouchers.index') }}">Vouchers</a>
             <a href="{{ route('home') }}" class="btn btn-sm btn-outline-light">Back to Site</a>

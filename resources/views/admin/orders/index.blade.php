@@ -23,6 +23,7 @@
         <div class="container">
             <a class="navbar-brand" href="{{ route('admin.books.index') }}">⚙️ TurnPage Admin</a>
             <div class="ms-auto">
+                <a class="nav-link d-inline" href="{{ route('admin.dashboard') }}">Dashboard</a>
                 <a class="nav-link d-inline" href="{{ route('admin.books.index') }}">Books</a>
                 <a class="nav-link d-inline" href="{{ route('admin.orders.index') }}">Orders</a>
                 <a class="nav-link d-inline" href="{{ route('admin.vouchers.index') }}">Vouchers</a>

@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\AuthorController as AdminAuthorController;
 use App\Http\Controllers\Admin\PublisherController as AdminPublisherController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\VoucherController as AdminVoucherController;
+use App\Http\Controllers\Admin\DashboardController;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
@@ -48,6 +49,9 @@ Route::delete('/wishlist/remove/{wishlistId}', [WishlistController::class, 'remo
 
 
 Route::middleware('admin')->prefix('admin')->name('admin.')->group(function () {
+
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
     Route::get('/books', [AdminBookController::class, 'index'])->name('books.index');
     Route::get('/books/create', [AdminBookController::class, 'create'])->name('books.create');
     Route::post('/books', [AdminBookController::class, 'store'])->name('books.store');

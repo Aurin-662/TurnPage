@@ -1,0 +1,100 @@
+CREATE OR REPLACE PROCEDURE PLACE_ORDER(
+    P_USER_ID        IN NUMBER,
+    P_PAYMENT_METHOD IN VARCHAR2
+) IS
+    V_CART_ID        NUMBER;
+    V_NEW_ORDER_ID   NUMBER;
+    V_NEW_ITEM_ID    NUMBER;
+    V_NEW_PAYMENT_ID NUMBER;
+    V_TOTAL_AMOUNT   NUMBER := 0;
+    V_STOCK_OK       NUMBER;
+    V_ITEM_COUNT     NUMBER;
+    E_EMPTY_CART     EXCEPTION;
+    E_OUT_OF_STOCK   EXCEPTION;
+BEGIN
+    -- Step 1: Get the user's cart
+    SELECT CART_ID INTO V_CART_ID
+    FROM CART
+    WHERE USER_ID = P_USER_ID;
+
+    -- Step 2: Check if cart has items
+    SELECT COUNT(*) INTO V_ITEM_COUNT
+    FROM CART_ITEM
+    WHERE CART_ID = V_CART_ID;
+
+    IF V_ITEM_COUNT = 0 THEN
+        RAISE E_EMPTY_CART;
+    END IF;
+
+    -- Step 3: Check stock availability
+    V_STOCK_OK := CHECK_STOCK_AVAILABLE(V_CART_ID);
+    IF V_STOCK_OK = 1 THEN
+        RAISE E_OUT_OF_STOCK;
+    END IF;
+
+    -- Step 4: Calculate total amount
+    SELECT SUM(QUANTITY * PRICE) INTO V_TOTAL_AMOUNT
+    FROM CART_ITEM
+    WHERE CART_ID = V_CART_ID;
+
+    -- Step 5: Create new ORDER
+    SELECT NVL(MAX(ORDER_ID), 0) + 1 INTO V_NEW_ORDER_ID FROM ORDERS;
+
+    INSERT INTO ORDERS (ORDER_ID, USER_ID, VOUCHER_ID, ORDER_DATE, TOTAL_AMOUNT, STATUS)
+    VALUES (V_NEW_ORDER_ID, P_USER_ID, NULL, SYSDATE, V_TOTAL_AMOUNT, 'Pending');
+
+    -- Step 6: Move cart items into ORDER_ITEM + reduce stock
+    SELECT NVL(MAX(ORDER_ITEM_ID), 0) INTO V_NEW_ITEM_ID FROM ORDER_ITEM;
+
+    FOR ITEM_REC IN (
+        SELECT BOOK_ID, QUANTITY, PRICE
+        FROM CART_ITEM
+        WHERE CART_ID = V_CART_ID
+    )
+    LOOP
+        V_NEW_ITEM_ID := V_NEW_ITEM_ID + 1;
+
+        INSERT INTO ORDER_ITEM (ORDER_ITEM_ID, ORDER_ID, BOOK_ID, QUANTITY, PRICE)
+        VALUES (V_NEW_ITEM_ID, V_NEW_ORDER_ID, ITEM_REC.BOOK_ID, ITEM_REC.QUANTITY, ITEM_REC.PRICE);
+
+        -- Reduce stock
+        UPDATE BOOK
+        SET STOCK_QUANTITY = STOCK_QUANTITY - ITEM_REC.QUANTITY
+        WHERE BOOK_ID = ITEM_REC.BOOK_ID;
+
+        DBMS_OUTPUT.PUT_LINE('Added item: BOOK_ID ' || ITEM_REC.BOOK_ID || ', QTY ' || ITEM_REC.QUANTITY);
+    END LOOP;
+
+    -- Step 7: Create PAYMENT record
+    SELECT NVL(MAX(PAYMENT_ID), 0) + 1 INTO V_NEW_PAYMENT_ID FROM PAYMENT;
+
+    INSERT INTO PAYMENT (PAYMENT_ID, ORDER_ID, PAYMENT_METHOD, AMOUNT, PAYMENT_STATUS, PAYMENT_DATE, TRANSACTION_ID)
+    VALUES (
+        V_NEW_PAYMENT_ID, V_NEW_ORDER_ID, P_PAYMENT_METHOD, V_TOTAL_AMOUNT,
+        CASE WHEN P_PAYMENT_METHOD = 'Cash on Delivery' THEN 'Pending' ELSE 'Completed' END,
+        SYSDATE, 'TXN' || TO_CHAR(SYSDATE, 'YYYYMMDDHH24MISS')
+    );
+
+    -- Step 8: Clear the cart
+    DELETE FROM CART_ITEM WHERE CART_ID = V_CART_ID;
+
+    -- Step 9: Commit the entire transaction
+    COMMIT;
+
+    DBMS_OUTPUT.PUT_LINE('Order placed successfully! ORDER_ID: ' || V_NEW_ORDER_ID);
+
+EXCEPTION
+    WHEN E_EMPTY_CART THEN
+        DBMS_OUTPUT.PUT_LINE('Cannot place order: Cart is empty.');
+        ROLLBACK;
+    WHEN E_OUT_OF_STOCK THEN
+        DBMS_OUTPUT.PUT_LINE('Cannot place order: One or more books are out of stock.');
+        ROLLBACK;
+    WHEN NO_DATA_FOUND THEN
+        DBMS_OUTPUT.PUT_LINE('Error: User or cart not found.');
+        ROLLBACK;
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('Unexpected error: ' || SQLERRM);
+        ROLLBACK;
+END;
+/
