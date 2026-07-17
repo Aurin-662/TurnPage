@@ -1,94 +1,73 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>My Cart — TurnPage</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body { background-color: #f8f5f0; }
-        .navbar { background-color: #2c3e50; }
-        .navbar-brand { color: #fff !important; font-weight: bold; font-size: 1.5rem; }
-        .nav-link { color: #ecf0f1 !important; margin-left: 10px; }
-        .cart-item-img { width: 70px; height: 90px; background: #ddd; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: #888; }
-        .total-box { background: #fff; border-radius: 10px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
-    </style>
-</head>
-<body>
+@extends('layouts.app')
 
-    <nav class="navbar navbar-expand-lg">
-        <div class="container">
-            <a class="navbar-brand" href="{{ route('home') }}">📖 TurnPage</a>
-            <div class="ms-auto">
-                <a class="nav-link d-inline" href="{{ route('home') }}">Home</a>
-                <a class="nav-link d-inline" href="{{ route('books.index') }}">All Books</a>
-                <a class="nav-link d-inline" href="{{ route('cart.view') }}">🛒 Cart</a>
-            </div>
-        </div>
-    </nav>
+@section('title', 'My Cart — TurnPage')
 
-    <div class="container mt-5">
-        <h2 class="mb-4">My Cart</h2>
+@section('styles')
+<style>
+    .cart-card { background: #fff; border-radius: 10px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 16px; }
+    .cart-book-cover { width: 70px; height: 90px; background: linear-gradient(135deg, #e8e0d5, #d4c9bb); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; flex-shrink: 0; }
+    .summary-box { background: #fff; border-radius: 10px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); position: sticky; top: 90px; }
+    .btn-checkout { background: #c0392b; color: #fff; border: none; padding: 14px; border-radius: 8px; font-size: 1rem; width: 100%; }
+    .btn-checkout:hover { background: #a93226; color: #fff; }
+    .price-tag { color: #c0392b; font-weight: 700; }
+</style>
+@endsection
 
-        @if(session('success'))
-            <div class="alert alert-success">{{ session('success') }}</div>
-        @endif
-        @if(session('error'))
-            <div class="alert alert-danger">{{ session('error') }}</div>
-        @endif
+@section('content')
+<div class="container mt-4 pb-5">
+    <h2 class="mb-4" style="font-family:'Merriweather',serif;">My Cart</h2>
 
-        @if(count($cartItems) > 0)
-        <div class="row">
-            <div class="col-md-8">
-                @foreach($cartItems as $item)
-                <div class="card mb-3">
-                    <div class="card-body d-flex align-items-center">
-                        <div class="cart-item-img me-3">No Image</div>
-                        <div class="flex-grow-1">
-                            <h6>{{ $item->book->title ?? 'Unknown Book' }}</h6>
-                            <p class="text-muted mb-1">Tk. {{ number_format($item->price, 2) }} each</p>
-
-                            <form action="{{ route('cart.update', $item->cart_item_id) }}" method="POST" class="d-inline-flex align-items-center">
-                                @csrf
-                                @method('PUT')
-                                <input type="number" name="quantity" value="{{ $item->quantity }}" min="1" class="form-control form-control-sm me-2" style="width: 70px;">
-                                <button type="submit" class="btn btn-sm btn-outline-secondary">Update</button>
-                            </form>
-                        </div>
-                        <div class="text-end">
-                            <p class="fw-bold">Tk. {{ number_format($item->price * $item->quantity, 2) }}</p>
-                            <form action="{{ route('cart.remove', $item->cart_item_id) }}" method="POST">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-link text-danger">Remove</button>
-                            </form>
-                        </div>
-                    </div>
+    @if(count($cartItems) > 0)
+    <div class="row g-4">
+        <div class="col-md-8">
+            @foreach($cartItems as $item)
+            <div class="cart-card d-flex gap-3 align-items-center">
+                <div class="cart-book-cover">📖</div>
+                <div class="flex-grow-1">
+                    <h6 class="mb-1">{{ $item->book->title ?? 'Unknown' }}</h6>
+                    <p class="text-muted small mb-2">Tk. {{ number_format($item->price, 2) }} each</p>
+                    <form action="{{ route('cart.update', $item->cart_item_id) }}" method="POST" class="d-flex align-items-center gap-2">
+                        @csrf
+                        @method('PUT')
+                        <input type="number" name="quantity" value="{{ $item->quantity }}" min="1" class="form-control form-control-sm" style="width:70px;">
+                        <button type="submit" class="btn btn-sm btn-outline-secondary">Update</button>
+                    </form>
                 </div>
-                @endforeach
+                <div class="text-end">
+                    <p class="price-tag mb-2">Tk. {{ number_format($item->price * $item->quantity, 2) }}</p>
+                    <form action="{{ route('cart.remove', $item->cart_item_id) }}" method="POST">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-sm btn-link text-danger p-0">Remove</button>
+                    </form>
+                </div>
             </div>
+            @endforeach
+        </div>
 
-            <div class="col-md-4">
-                <div class="total-box">
-                    <h5>Order Summary</h5>
-                    <hr>
-                    <div class="d-flex justify-content-between mb-2">
-                        <span>Subtotal</span>
-                        <span>Tk. {{ number_format($total, 2) }}</span>
-                    </div>
-                    <div class="d-flex justify-content-between fw-bold mb-3">
-                        <span>Total</span>
-                        <span>Tk. {{ number_format($total, 2) }}</span>
-                    </div>
-                    <a href="{{ route('checkout.show') }}" class="btn btn-danger w-100">Proceed to Checkout</a>
+        <div class="col-md-4">
+            <div class="summary-box">
+                <h6 class="mb-3">Order Summary</h6>
+                <hr>
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="text-muted">Subtotal ({{ count($cartItems) }} items)</span>
+                    <span>Tk. {{ number_format($cartItems->sum(fn($i) => $i->price * $i->quantity), 2) }}</span>
+                </div>
+                <hr>
+                <div class="d-flex justify-content-between fw-bold mb-4">
+                    <span>Total</span>
+                    <span class="price-tag">Tk. {{ number_format($cartItems->sum(fn($i) => $i->price * $i->quantity), 2) }}</span>
+                </div>
+                <a href="{{ route('checkout.show') }}" class="btn-checkout text-decoration-none d-block text-center">Proceed to Checkout →</a>
             </div>
         </div>
-        @else
-        <div class="text-center py-5">
-            <h5 class="text-muted">Your cart is empty.</h5>
-            <a href="{{ route('books.index') }}" class="btn btn-dark mt-3">Browse Books</a>
-        </div>
-        @endif
     </div>
-
-</body>
-</html>
+    @else
+    <div class="text-center py-5">
+        <div style="font-size:5rem;">🛒</div>
+        <h4 class="mt-3 text-muted">Your cart is empty</h4>
+        <a href="{{ route('books.index') }}" class="btn btn-dark mt-3">Browse Books</a>
+    </div>
+    @endif
+</div>
+@endsection

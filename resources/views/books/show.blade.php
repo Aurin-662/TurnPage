@@ -1,106 +1,139 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>{{ $book->title }} — TurnPage</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body { background-color: #f8f5f0; }
-        .navbar { background-color: #2c3e50; }
-        .navbar-brand { color: #fff !important; font-weight: bold; font-size: 1.5rem; }
-        .book-cover-large { height: 350px; background: #ddd; display: flex; align-items: center; justify-content: center; color: #888; }
-        .price-tag { color: #c0392b; font-weight: bold; font-size: 1.6rem; }
-    </style>
-</head>
-<body>
+@extends('layouts.app')
 
-    <nav class="navbar navbar-expand-lg">
-        <div class="container">
-            <a class="navbar-brand" href="{{ route('books.index') }}">📖 TurnPage</a>
+@section('title', $book->title . ' — TurnPage')
+
+@section('styles')
+<style>
+    .book-cover-large {
+        height: 380px;
+        background: linear-gradient(135deg, #e8e0d5, #d4c9bb);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 6rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    .book-title { font-family: 'Merriweather', serif; font-size: 1.8rem; font-weight: 700; }
+    .book-author { color: #666; font-size: 1rem; }
+    .book-price { color: #c0392b; font-weight: 700; font-size: 1.8rem; }
+    .star-rating { color: #e8a045; font-size: 1.1rem; }
+    .meta-badge { background: #f0f0f0; border-radius: 6px; padding: 4px 12px; font-size: 0.85rem; color: #555; display: inline-block; margin-right: 8px; margin-bottom: 8px; }
+    .btn-cart { background: #c0392b; color: #fff; border: none; padding: 12px 32px; border-radius: 8px; font-size: 1rem; }
+    .btn-cart:hover { background: #a93226; color: #fff; }
+    .btn-wishlist { border: 2px solid #e8a045; color: #e8a045; background: #fff; padding: 12px 24px; border-radius: 8px; font-size: 1rem; }
+    .btn-wishlist:hover { background: #e8a045; color: #fff; }
+    .review-card { background: #fff; border-radius: 10px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .review-form { background: #fff; border-radius: 10px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 24px; }
+    .section-divider { border: none; border-top: 2px solid #efe8df; margin: 40px 0; }
+</style>
+@endsection
+
+@section('content')
+<div class="container mt-4 pb-5">
+
+    <a href="{{ route('books.index') }}" class="text-muted text-decoration-none mb-3 d-inline-block">← Back to all books</a>
+
+    <div class="row g-5 mt-1">
+        <!-- Book Cover -->
+        <div class="col-md-4">
+            <div class="book-cover-large">📖</div>
         </div>
-    </nav>
 
-    <div class="container mt-5">
-        <a href="{{ route('books.index') }}" class="btn btn-link mb-3">&larr; Back to all books</a>
+        <!-- Book Details -->
+        <div class="col-md-8">
+            <h1 class="book-title mb-2">{{ $book->title }}</h1>
+            <p class="book-author mb-3">by <strong>{{ $book->author->author_name ?? 'Unknown' }}</strong></p>
 
-        <div class="row">
-            <div class="col-md-4">
-                <div class="book-cover-large">No Image</div>
+            <p class="mb-3">
+                <span class="star-rating">{{ str_repeat('★', (int)$book->star_rating) }}{{ str_repeat('☆', 5 - (int)$book->star_rating) }}</span>
+                <span class="text-muted ms-1">{{ $book->star_rating }} ({{ $book->review_count }} reviews)</span>
+            </p>
+
+            <p class="book-price mb-3">Tk. {{ number_format($book->price, 2) }}</p>
+
+            <div class="mb-4">
+                <span class="meta-badge">📚 {{ $book->page_count }} pages</span>
+                <span class="meta-badge">🌐 {{ $book->language }}</span>
+                <span class="meta-badge">🏢 {{ $book->publisher->publisher_name ?? 'Unknown' }}</span>
+                @if($book->stock_quantity > 0)
+                    <span class="meta-badge" style="background:#d4edda;color:#155724;">✅ In Stock ({{ $book->stock_quantity }})</span>
+                @else
+                    <span class="meta-badge" style="background:#f8d7da;color:#721c24;">❌ Out of Stock</span>
+                @endif
             </div>
-            <div class="col-md-8">
-                <h2>{{ $book->title }}</h2>
-                <p class="text-muted">by <strong>{{ $book->author->author_name ?? 'Unknown' }}</strong></p>
-                <p>Publisher: {{ $book->publisher->publisher_name ?? 'Unknown' }}</p>
-                <p class="star-rating">★ {{ $book->star_rating }} ({{ $book->review_count }} reviews)</p>
-                <p class="price-tag">Tk. {{ number_format($book->price, 2) }}</p>
-                <p>Stock: {{ $book->stock_quantity }} copies available</p>
-                <p>Language: {{ $book->language }}</p>
-                <p>Pages: {{ $book->page_count }}</p>
-                <p>ISBN: {{ $book->isbn }}</p>
 
+            @if($book->isbn)
+            <p class="text-muted small mb-4">ISBN: {{ $book->isbn }}</p>
+            @endif
+
+            <div class="d-flex gap-3 flex-wrap">
+                @if($book->stock_quantity > 0)
                 <form action="{{ route('cart.add', $book->book_id) }}" method="POST">
-                                @csrf
-                        <button type="submit" class="btn btn-danger mt-3">Add to Cart</button>
+                    @csrf
+                    <button type="submit" class="btn-cart">🛒 Add to Cart</button>
                 </form>
-
-                <form action="{{ route('wishlist.add', $book->book_id) }}" method="POST" class="d-inline">
-                       @csrf
-                        <button type="submit" class="btn btn-outline-danger mt-3">❤️ Add to Wishlist</button>
-                </form>
-
-                <hr class="mt-5">
-
-                 <h4 class="mt-4">Customer Reviews</h4>
-
-                   @if(session('success'))
-                   <div class="alert alert-success">{{ session('success') }}</div>
-                  @endif
-                @if(session('error'))
-                <div class="alert alert-danger">{{ session('error') }}</div>
                 @endif
 
-        <!-- Write a Review Form -->
-        <div class="card p-4 mb-4 mt-3">
-            <h6>Write a Review</h6>
-            <form action="{{ route('review.store', $book->book_id) }}" method="POST">
-                @csrf
-                <div class="mb-2">
-                    <label class="form-label">Rating</label>
-                    <select name="rating" class="form-select" style="max-width: 150px;" required>
-                        <option value="5">5 - Excellent</option>
-                        <option value="4">4 - Good</option>
-                        <option value="3">3 - Average</option>
-                        <option value="2">2 - Poor</option>
-                        <option value="1">1 - Terrible</option>
-                    </select>
-                </div>
-                <div class="mb-2">
-                    <label class="form-label">Your Review</label>
-                    <textarea name="review_text" class="form-control" rows="3" placeholder="Share your thoughts about this book..."></textarea>
-                </div>
-                <button type="submit" class="btn btn-dark">Submit Review</button>
-            </form>
-        </div>
-
-        <!-- All Reviews -->
-        @forelse($reviews as $review)
-        <div class="border-bottom pb-3 mb-3">
-            <strong>{{ $review->user->name ?? 'Anonymous' }}</strong>
-            <span class="star-rating">
-                @for($i = 1; $i <= 5; $i++)
-                    {{ $i <= $review->rating ? '★' : '☆' }}
-                @endfor
-            </span>
-            <p class="mb-1 text-muted small">{{ \Carbon\Carbon::parse($review->review_date)->format('d M Y') }}</p>
-            <p>{{ $review->review_text }}</p>
-        </div>
-        @empty
-        <p class="text-muted">No reviews yet. Be the first to review this book!</p>
-        @endforelse
-
+                <form action="{{ route('wishlist.add', $book->book_id) }}" method="POST">
+                    @csrf
+                    <button type="submit" class="btn-wishlist">❤️ Wishlist</button>
+                </form>
             </div>
         </div>
     </div>
 
-</body>
-</html>
+    <hr class="section-divider">
+
+    <!-- Review Section -->
+    <h3 class="mb-4" style="font-family:'Merriweather',serif;">Customer Reviews</h3>
+
+    <!-- Write Review Form -->
+    @if(session('user_id'))
+    <div class="review-form">
+        <h6 class="mb-3">Write a Review</h6>
+        <form action="{{ route('review.store', $book->book_id) }}" method="POST">
+            @csrf
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <label class="form-label small">Rating</label>
+                    <select name="rating" class="form-select" required>
+                        <option value="5">★★★★★ Excellent</option>
+                        <option value="4">★★★★☆ Good</option>
+                        <option value="3">★★★☆☆ Average</option>
+                        <option value="2">★★☆☆☆ Poor</option>
+                        <option value="1">★☆☆☆☆ Terrible</option>
+                    </select>
+                </div>
+                <div class="col-md-9">
+                    <label class="form-label small">Your Review</label>
+                    <textarea name="review_text" class="form-control" rows="2" placeholder="Share your thoughts..."></textarea>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-dark mt-3">Submit Review</button>
+        </form>
+    </div>
+    @else
+    <div class="alert alert-light border mb-4">
+        <a href="{{ route('login') }}">Login</a> to write a review.
+    </div>
+    @endif
+
+    <!-- Reviews List -->
+    @forelse($reviews as $review)
+    <div class="review-card">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <strong>{{ $review->user->name ?? 'Anonymous' }}</strong>
+            <span class="star-rating">
+                {{ str_repeat('★', (int)$review->rating) }}{{ str_repeat('☆', 5 - (int)$review->rating) }}
+            </span>
+        </div>
+        <p class="text-muted small mb-2">{{ \Carbon\Carbon::parse($review->review_date)->format('d M Y') }}</p>
+        <p class="mb-0">{{ $review->review_text }}</p>
+    </div>
+    @empty
+    <p class="text-muted">No reviews yet. Be the first!</p>
+    @endforelse
+
+</div>
+@endsection

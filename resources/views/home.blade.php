@@ -1,119 +1,104 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>TurnPage — Your Online Bookstore</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body { background-color: #f8f5f0; font-family: 'Segoe UI', sans-serif; }
+@extends('layouts.app')
 
-        .navbar { background-color: #2c3e50; padding: 1rem 0; }
-        .navbar-brand { color: #fff !important; font-weight: bold; font-size: 1.6rem; }
-        .nav-link { color: #ecf0f1 !important; margin-left: 10px; }
-        .nav-link:hover { color: #f39c12 !important; }
+@section('title', 'TurnPage — Your Online Bookstore')
 
-        .hero {
-            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
-            color: #fff;
-            padding: 80px 0;
-            text-align: center;
-        }
-        .hero h1 { font-size: 3rem; font-weight: bold; }
-        .hero p { font-size: 1.2rem; color: #bdc3c7; margin-bottom: 30px; }
-        .hero .btn-primary {
-            background-color: #c0392b;
-            border: none;
-            padding: 12px 35px;
-            font-size: 1.1rem;
-            border-radius: 30px;
-        }
-        .hero .btn-primary:hover { background-color: #a93226; }
+@section('styles')
+<style>
+    .hero {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 60%, #0f3460 100%);
+        color: #fff;
+        padding: 90px 0 80px;
+        text-align: center;
+    }
+    .hero h1 {
+        font-family: 'Merriweather', serif;
+        font-size: 2.8rem;
+        font-weight: 700;
+        margin-bottom: 16px;
+    }
+    .hero h1 span { color: #e8a045; }
+    .hero p { font-size: 1.1rem; color: #b0b8c8; margin-bottom: 32px; }
+    .hero .btn-hero {
+        background: #e8a045;
+        color: #fff;
+        border: none;
+        padding: 12px 36px;
+        font-size: 1rem;
+        border-radius: 30px;
+        text-decoration: none;
+        transition: background 0.2s;
+    }
+    .hero .btn-hero:hover { background: #d4903a; color: #fff; }
 
-        .section-title {
-            text-align: center;
-            margin: 60px 0 40px;
-            font-weight: bold;
-            color: #2c3e50;
-        }
+    .section-title {
+        font-family: 'Merriweather', serif;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #1a1a2e;
+        margin-bottom: 28px;
+    }
+    .section-title span { color: #e8a045; }
 
-        .book-card { transition: transform 0.2s; height: 100%; border: none; }
-        .book-card:hover { transform: translateY(-5px); box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
-        .book-cover { height: 200px; background: #e0e0e0; display: flex; align-items: center; justify-content: center; color: #999; }
-        .price-tag { color: #c0392b; font-weight: bold; }
-        .star-rating { color: #f39c12; }
+    .book-card {
+        background: #fff;
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+        transition: transform 0.2s, box-shadow 0.2s;
+        height: 100%;
+    }
+    .book-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+    .book-cover {
+        height: 200px;
+        background: linear-gradient(135deg, #e8e0d5, #d4c9bb);
+        border-radius: 10px 10px 0 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 3rem;
+    }
+    .book-title { font-weight: 600; font-size: 0.95rem; margin-bottom: 4px; }
+    .book-author { color: #888; font-size: 0.82rem; }
+    .book-price { color: #c0392b; font-weight: 700; font-size: 1rem; }
+    .star-rating { color: #e8a045; font-size: 0.85rem; }
+</style>
+@endsection
 
-        footer {
-            background-color: #2c3e50;
-            color: #bdc3c7;
-            text-align: center;
-            padding: 25px 0;
-            margin-top: 60px;
-        }
-    </style>
-</head>
-<body>
+@section('content')
 
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg">
-        <div class="container">
-            <a class="navbar-brand" href="{{ route('home') }}">📖 TurnPage</a>
-            <div class="ms-auto">
-                <a class="nav-link d-inline" href="{{ route('home') }}">Home</a>
-                <a class="nav-link d-inline" href="{{ route('books.index') }}">All Books</a>
-                <a class="nav-link d-inline" href="{{ route('cart.view') }}">🛒 Cart</a>
-                <a class="nav-link d-inline" href="{{ route('orders.history') }}">📦 My Orders</a>
-                
-            @if(session('user_id'))
-                <span class="nav-link d-inline">Hi, {{ session('user_name') }}</span>
-                    <form action="{{ route('logout') }}" method="POST" class="d-inline">
-                              @csrf
-                            @if(session('user_role') === 'admin')
-    <a class="nav-link d-inline" href="{{ route('admin.books.index') }}">⚙️ Admin Panel</a>
-@endif
-                         <button type="submit" class="btn btn-sm btn-outline-light">Logout</button>
-                     </form>
-            @else
-                 <a class="nav-link d-inline" href="{{ route('login') }}">Login</a>
-            @endif            
-             </div>
-        </div>
-    </nav>
-
-    <!-- Hero Section -->
-    <div class="hero">
-        <div class="container">
-            <h1>Discover Your Next Favorite Book</h1>
-            <p>Thousands of titles, one click away — TurnPage brings the bookstore to you.</p>
-            <a href="{{ route('books.index') }}" class="btn btn-primary">Browse All Books</a>
-        </div>
-    </div>
-
-    <!-- Featured Books -->
+<!-- Hero -->
+<div class="hero">
     <div class="container">
-        <h2 class="section-title">⭐ Featured Books</h2>
+        <h1>Discover Your Next<br><span>Favorite Book</span></h1>
+        <p>Thousands of titles, one click away — TurnPage brings the bookstore to you.</p>
+        <a href="{{ route('books.index') }}" class="btn-hero">Browse All Books</a>
+    </div>
+</div>
 
-        <div class="row g-4">
-            @foreach($featuredBooks as $book)
-            <div class="col-md-3">
-                <div class="card book-card shadow-sm">
-                    <div class="book-cover">No Image</div>
-                    <div class="card-body">
-                        <h6 class="card-title">{{ $book->title }}</h6>
-                        <p class="text-muted small mb-1">by {{ $book->author->author_name ?? 'Unknown' }}</p>
-                        <p class="mb-1"><span class="star-rating">★ {{ $book->star_rating }}</span></p>
-                        <p class="price-tag mb-2">Tk. {{ number_format($book->price, 2) }}</p>
-                        <a href="{{ route('books.show', $book->book_id) }}" class="btn btn-sm btn-outline-dark w-100">View Details</a>
+<!-- Featured Books -->
+<div class="container mt-5 pb-4">
+    <h2 class="section-title">⭐ Featured <span>Books</span></h2>
+
+    <div class="row g-4">
+        @foreach($featuredBooks as $book)
+        <div class="col-md-3">
+            <div class="book-card">
+                <div class="book-cover">📖</div>
+                <div class="p-3">
+                    <p class="book-title">{{ $book->title }}</p>
+                    <p class="book-author mb-1">{{ $book->author->author_name ?? 'Unknown' }}</p>
+                    <p class="star-rating mb-1">★ {{ $book->star_rating }}
+                        <small class="text-muted">({{ $book->review_count }})</small>
+                    </p>
+                    <div class="d-flex justify-content-between align-items-center mt-2">
+                        <span class="book-price">Tk. {{ number_format($book->price, 0) }}</span>
+                        <a href="{{ route('books.show', $book->book_id) }}" class="btn btn-sm btn-outline-dark">View</a>
                     </div>
                 </div>
             </div>
-            @endforeach
         </div>
+        @endforeach
     </div>
+</div>
 
-    <!-- Footer -->
-    <footer>
-        <p class="mb-0">&copy; 2026 TurnPage. A Database Systems Lab Project — CSE 3109/3110.</p>
-    </footer>
-
-</body>
-</html>
+@endsection
