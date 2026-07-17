@@ -20,7 +20,7 @@
     <div class="row g-4">
         <div class="col-md-7">
             <!-- Order Summary -->
-            <div class="checkout-card mb-4">
+            <div class="checkout-card reveal-on-scroll mb-4">
                 <h6 class="mb-3">Order Items</h6>
                 <hr>
                 @foreach($cartItems as $item)
@@ -71,7 +71,7 @@
 
         <!-- Payment -->
         <div class="col-md-5">
-            <div class="checkout-card">
+            <div class="checkout-card reveal-on-scroll">
                 <h6 class="mb-3">Payment Method</h6>
                 <form action="{{ route('checkout.place') }}" method="POST">
                     @csrf

@@ -13,7 +13,7 @@
 
 @section('content')
 <div class="container">
-    <div class="auth-card">
+    <div class="auth-card reveal-on-scroll">
         <h2 class="auth-title text-center">Create Account</h2>
         <p class="text-muted text-center small mb-4">Join TurnPage today</p>
 

@@ -21,7 +21,7 @@
     <h2 class="mb-4" style="font-family:'Merriweather',serif;">All Books</h2>
 
     <!-- Filter Bar -->
-    <div class="filter-bar">
+    <div class="filter-bar reveal">
         <form action="{{ route('books.index') }}" method="GET" class="row g-2 align-items-end">
             <div class="col-md-4">
                 <input type="text" name="search" class="form-control" placeholder="🔍 Search by title or author..." value="{{ request('search') }}">
@@ -56,7 +56,7 @@
 
     <p class="result-count mb-3">{{ $books->count() }} book(s) found</p>
 
-    <div class="row g-4">
+    <div class="row g-4 reveal-on-scroll">
         @forelse($books as $book)
         <div class="col-md-3">
             <div class="book-card">

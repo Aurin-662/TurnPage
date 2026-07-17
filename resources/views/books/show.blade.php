@@ -34,7 +34,7 @@
 
     <a href="{{ route('books.index') }}" class="text-muted text-decoration-none mb-3 d-inline-block">← Back to all books</a>
 
-    <div class="row g-5 mt-1">
+    <div class="row g-5 mt-1 reveal-on-scroll">
         <!-- Book Cover -->
         <div class="col-md-4">
             <div class="book-cover-large">📖</div>
@@ -90,7 +90,7 @@
 
     <!-- Write Review Form -->
     @if(session('user_id'))
-    <div class="review-form">
+    <div class="review-form reveal-on-scroll">
         <h6 class="mb-3">Write a Review</h6>
         <form action="{{ route('review.store', $book->book_id) }}" method="POST">
             @csrf

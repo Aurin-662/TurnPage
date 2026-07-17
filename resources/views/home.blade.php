@@ -67,19 +67,19 @@
 @section('content')
 
 <!-- Hero -->
-<div class="hero">
-    <div class="container">
+<div class="hero reveal">
+    <div class="container page-intro">
         <h1>Discover Your Next<br><span>Favorite Book</span></h1>
         <p>Thousands of titles, one click away — TurnPage brings the bookstore to you.</p>
-        <a href="{{ route('books.index') }}" class="btn-hero">Browse All Books</a>
+        <a href="{{ route('books.index') }}" class="btn-hero btn-gradient">Browse All Books</a>
     </div>
 </div>
 
 <!-- Featured Books -->
 <div class="container mt-5 pb-4">
-    <h2 class="section-title">⭐ Featured <span>Books</span></h2>
+    <h2 class="section-title reveal-on-scroll">⭐ Featured <span>Books</span></h2>
 
-    <div class="row g-4">
+    <div class="row g-4 reveal-on-scroll">
         @foreach($featuredBooks as $book)
         <div class="col-md-3">
             <div class="book-card">

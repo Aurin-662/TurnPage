@@ -21,7 +21,7 @@
     <div class="row g-4">
         <div class="col-md-8">
             @foreach($cartItems as $item)
-            <div class="cart-card d-flex gap-3 align-items-center">
+            <div class="cart-card reveal-on-scroll d-flex gap-3 align-items-center">
                 <div class="cart-book-cover">📖</div>
                 <div class="flex-grow-1">
                     <h6 class="mb-1">{{ $item->book->title ?? 'Unknown' }}</h6>
@@ -46,7 +46,7 @@
         </div>
 
         <div class="col-md-4">
-            <div class="summary-box">
+            <div class="summary-box reveal-on-scroll">
                 <h6 class="mb-3">Order Summary</h6>
                 <hr>
                 <div class="d-flex justify-content-between mb-2">

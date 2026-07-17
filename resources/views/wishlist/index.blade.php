@@ -18,7 +18,7 @@
     <div class="row g-4">
         @forelse($wishlistItems as $item)
         <div class="col-md-3">
-            <div class="book-card">
+            <div class="book-card reveal-on-scroll">
                 <div class="book-cover">📖</div>
                 <div class="p-3">
                     <h6 class="mb-1">{{ $item->book->title ?? 'Unknown' }}</h6>
