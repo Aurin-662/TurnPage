@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Book;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class BookController extends Controller
 {
@@ -62,6 +63,8 @@ class BookController extends Controller
     {
         $book = Book::with('author', 'publisher')->findOrFail($id);
         $reviews = \App\Models\Review::with('user')->where('book_id', $id)->orderBy('review_date', 'desc')->get();
+        $bookRating = $this->getBookRating($id, $book->star_rating);
+        $reviewCount = $this->getReviewCount($id, $book->review_count);
         
         // Get related books by same author or publisher, limit to 8
         $relatedBooks = Book::with('author', 'publisher')
@@ -82,6 +85,38 @@ class BookController extends Controller
                 ->get();
         }
         
-        return view('books.show', compact('book', 'reviews', 'relatedBooks'));
+        return view('books.show', compact('book', 'reviews', 'relatedBooks', 'bookRating', 'reviewCount'));
+    }
+
+    private function getBookRating($bookId, $fallback)
+    {
+        try {
+            if (DB::getDriverName() === 'oracle') {
+                $result = DB::select('SELECT GET_BOOK_RATING(?) AS rating FROM dual', [$bookId]);
+                if (!empty($result) && isset($result[0]->RATING)) {
+                    return (float) $result[0]->RATING;
+                }
+            }
+        } catch (\Throwable $e) {
+            // Fall back to stored column value when the Oracle function is unavailable.
+        }
+
+        return $fallback;
+    }
+
+    private function getReviewCount($bookId, $fallback)
+    {
+        try {
+            if (DB::getDriverName() === 'oracle') {
+                $result = DB::select('SELECT GET_REVIEW_COUNT(?) AS review_count FROM dual', [$bookId]);
+                if (!empty($result) && isset($result[0]->REVIEW_COUNT)) {
+                    return (int) $result[0]->REVIEW_COUNT;
+                }
+            }
+        } catch (\Throwable $e) {
+            // Fall back to stored column value when the Oracle function is unavailable.
+        }
+
+        return $fallback;
     }
 }

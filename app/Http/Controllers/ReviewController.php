@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Review;
 use App\Models\OrderItem;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 
 class ReviewController extends Controller
@@ -49,7 +50,13 @@ class ReviewController extends Controller
             'review_date' => now(),
         ]);
 
-        // The Oracle COMPOUND TRIGGER automatically updates BOOK.star_rating and review_count
+        try {
+            if (DB::getDriverName() === 'oracle') {
+                DB::statement('BEGIN UPDATE_BOOK_STATISTICS(?); END;', [$bookId]);
+            }
+        } catch (\Throwable $e) {
+            // Ignore DB-level issues and keep the review flow working.
+        }
 
         return back()->with('success', 'Thank you for your review!');
     }

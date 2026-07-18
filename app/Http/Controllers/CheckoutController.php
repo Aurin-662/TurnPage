@@ -45,7 +45,8 @@ class CheckoutController extends Controller
     if (Session::has('applied_voucher_code')) {
         $voucher = Voucher::where('voucher_code', Session::get('applied_voucher_code'))->first();
         if ($voucher && $subtotal >= $voucher->minimum_amount) {
-            $discount = round($subtotal * ($voucher->discount_percent / 100), 2);
+            $finalPrice = $this->calculateDiscountedPrice($subtotal, $voucher->discount_percent);
+            $discount = round(max($subtotal - $finalPrice, 0), 2);
             $appliedVoucher = $voucher;
         }
     }
@@ -116,8 +117,8 @@ public function placeOrder(Request $request)
                 $latestOrder = Order::where('user_id', $userId)->orderBy('order_id', 'desc')->first();
 
                 if ($latestOrder) {
-                    $discount = round($latestOrder->total_amount * ($voucher->discount_percent / 100), 2);
-                    $newTotal = $latestOrder->total_amount - $discount;
+                    $newTotal = $this->calculateDiscountedPrice($latestOrder->total_amount, $voucher->discount_percent);
+                    $discount = round(max($latestOrder->total_amount - $newTotal, 0), 2);
 
                     $latestOrder->voucher_id = $voucher->voucher_id;
                     $latestOrder->total_amount = $newTotal;
@@ -156,5 +157,21 @@ public function placeOrder(Request $request)
                         ->get();
 
         return view('checkout.history', compact('orders'));
+    }
+
+    private function calculateDiscountedPrice($subtotal, $discountPercent)
+    {
+        try {
+            if (DB::getDriverName() === 'oracle') {
+                $result = DB::select('SELECT GET_DISCOUNT_PRICE(?, ?) AS final_price FROM dual', [$subtotal, $discountPercent]);
+                if (!empty($result) && isset($result[0]->FINAL_PRICE)) {
+                    return (float) $result[0]->FINAL_PRICE;
+                }
+            }
+        } catch (\Throwable $e) {
+            // Fall back to PHP calculation when the Oracle function is unavailable.
+        }
+
+        return round($subtotal * (1 - ($discountPercent / 100)), 2);
     }
 }

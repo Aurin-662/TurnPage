@@ -53,8 +53,8 @@
             <p class="book-author mb-3">by <strong>{{ $book->author->author_name ?? 'Unknown' }}</strong></p>
 
             <p class="mb-3">
-                <span class="star-rating">{{ str_repeat('★', (int)$book->star_rating) }}{{ str_repeat('☆', 5 - (int)$book->star_rating) }}</span>
-                <span class="text-muted ms-1">{{ $book->star_rating }} ({{ $book->review_count }} reviews)</span>
+                <span class="star-rating">{{ str_repeat('★', (int) round($bookRating)) }}{{ str_repeat('☆', 5 - (int) round($bookRating)) }}</span>
+                <span class="text-muted ms-1">{{ number_format($bookRating, 1) }} ({{ $reviewCount }} reviews)</span>
             </p>
 
             <p class="book-price mb-3">Tk. {{ number_format($book->price, 2) }}</p>
