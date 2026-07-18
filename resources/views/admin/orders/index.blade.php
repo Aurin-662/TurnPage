@@ -18,6 +18,28 @@
 <div class="container mt-4 pb-5">
     <h2 class="mb-4" style="font-weight:700;">Manage Orders</h2>
 
+    <div class="mb-4">
+        <form method="GET" action="{{ route('admin.orders.index') }}" class="row g-2 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Search</label>
+                <input type="text" name="search" value="{{ request('search') }}" class="form-control" placeholder="Order ID or customer name">
+            </div>
+            <div class="col-md-3">
+                <label class="form-label fw-semibold">Status</label>
+                <select name="status" class="form-select">
+                    <option value="">All statuses</option>
+                    @foreach($statuses as $status)
+                    <option value="{{ $status }}" {{ request('status') == $status ? 'selected' : '' }}>{{ $status }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-md-5 d-flex gap-2">
+                <button type="submit" class="btn btn-dark">Filter</button>
+                <a href="{{ route('admin.orders.index') }}" class="btn btn-outline-secondary">Reset</a>
+            </div>
+        </form>
+    </div>
+
     @forelse($orders as $order)
     <div class="order-card">
         <div class="d-flex justify-content-between align-items-center mb-2">

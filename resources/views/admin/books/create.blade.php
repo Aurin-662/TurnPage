@@ -91,7 +91,10 @@
                     </div>
                 </div>
 
-                <button type="submit" class="btn btn-dark w-100">Add Book</button>
+                <div class="d-flex gap-2">
+                    <a href="{{ route('admin.books.index') }}" class="btn btn-outline-secondary flex-grow-1">← Back to Books</a>
+                    <button type="submit" class="btn btn-dark flex-grow-1">Add Book</button>
+                </div>
             </form>
         </div>
     </div>

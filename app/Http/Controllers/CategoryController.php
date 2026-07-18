@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Book;
 use Illuminate\Support\Facades\DB;
 
 class CategoryController extends Controller
@@ -56,6 +57,7 @@ class CategoryController extends Controller
         }
 
         $books = $booksQuery->paginate(12);
+        $books = $this->attachCoverData($books);
 
         // Get filters for sidebar
         $authors = DB::table('CATEGORY_BOOKS_VIEW')
@@ -69,5 +71,31 @@ class CategoryController extends Controller
             ->first();
 
         return view('categories.show', compact('category', 'books', 'authors', 'priceRange'));
+    }
+
+    protected function attachCoverData($paginator)
+    {
+        $collection = $paginator->getCollection();
+        $ids = $collection->pluck('book_id')->filter()->unique()->toArray();
+
+        if (empty($ids)) {
+            return $paginator;
+        }
+
+        try {
+            $books = Book::whereIn('book_id', $ids)->get()->keyBy('book_id');
+        } catch (\Throwable $e) {
+            return $paginator;
+        }
+
+        $updated = $collection->map(function ($item) use ($books) {
+            $book = $books->get($item->book_id);
+            $item->cover_url = $book ? $book->cover_url : null;
+            $item->has_cover = !empty($item->cover_url);
+            return $item;
+        });
+
+        $paginator->setCollection($updated);
+        return $paginator;
     }
 }

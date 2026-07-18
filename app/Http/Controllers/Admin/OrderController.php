@@ -9,13 +9,27 @@ use Illuminate\Http\Request;
 class OrderController extends Controller
 {
     // List all orders
-    public function index()
+    public function index(Request $request)
     {
-        $orders = Order::with('items.book', 'payment')
-                        ->orderBy('order_date', 'desc')
-                        ->get();
+        $orders = Order::with('items.book', 'payment', 'user')
+            ->when($request->filled('status'), function ($query) use ($request) {
+                $query->where('status', $request->input('status'));
+            })
+            ->when($request->filled('search'), function ($query) use ($request) {
+                $search = $request->input('search');
+                $query->where(function ($sub) use ($search) {
+                    $sub->where('order_id', 'like', "%{$search}%")
+                        ->orWhereHas('user', function ($userQuery) use ($search) {
+                            $userQuery->where('name', 'like', "%{$search}%");
+                        });
+                });
+            })
+            ->orderBy('order_date', 'desc')
+            ->get();
 
-        return view('admin.orders.index', compact('orders'));
+        $statuses = ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'];
+
+        return view('admin.orders.index', compact('orders', 'statuses'));
     }
 
     // Update order status

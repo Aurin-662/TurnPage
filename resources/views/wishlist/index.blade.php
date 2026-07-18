@@ -19,7 +19,13 @@
         @forelse($wishlistItems as $item)
         <div class="col-md-3">
             <div class="book-card reveal-on-scroll">
-                <div class="book-cover">📖</div>
+                <div class="book-cover overflow-hidden position-relative">
+                    @if($item->book->has_cover ?? false)
+                        <img src="{{ $item->book->cover_url }}" alt="{{ $item->book->title ?? 'Book cover' }}" class="img-fluid h-100 w-100" style="object-fit: cover; position: absolute; inset: 0;" onerror="this.onerror=null;this.style.display='none'">
+                    @else
+                        <div class="h-100 d-flex align-items-center justify-content-center">📖</div>
+                    @endif
+                </div>
                 <div class="p-3">
                     <h6 class="mb-1">{{ $item->book->title ?? 'Unknown' }}</h6>
                     <p class="text-muted small mb-2">{{ $item->book->author->author_name ?? '' }}</p>

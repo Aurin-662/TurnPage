@@ -97,7 +97,13 @@
                 @forelse($books as $book)
                 <div class="col-md-4">
                     <div class="book-card">
-                        <div class="book-cover">📖</div>
+                        <div class="book-cover overflow-hidden position-relative">
+                            @if($book->has_cover ?? false)
+                                <img src="{{ $book->cover_url }}" alt="{{ $book->title }}" class="img-fluid h-100 w-100" style="object-fit: cover; position: absolute; inset: 0;" onerror="this.onerror=null;this.style.display='none'">
+                            @else
+                                <div class="h-100 d-flex align-items-center justify-content-center">📖</div>
+                            @endif
+                        </div>
                         <div class="p-3">
                             <p class="book-title mb-1">{{ $book->title }}</p>
                             <p class="book-author mb-2">{{ $book->author_name ?? 'Unknown' }}</p>

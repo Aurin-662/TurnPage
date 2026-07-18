@@ -67,7 +67,10 @@
                     <input type="number" name="usage_limit" class="form-control" min="1" value="100" required>
                 </div>
 
-                <button type="submit" class="btn btn-dark w-100">Create Voucher</button>
+                <div class="d-flex gap-2">
+                    <a href="{{ route('admin.vouchers.index') }}" class="btn btn-outline-secondary flex-grow-1">← Back to Vouchers</a>
+                    <button type="submit" class="btn btn-dark flex-grow-1">Create Voucher</button>
+                </div>
             </form>
         </div>
     </div>
