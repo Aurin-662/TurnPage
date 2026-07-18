@@ -33,6 +33,7 @@
             font-size: 0.9rem;
             padding: 0.5rem 0.8rem !important;
             transition: color 0.2s;
+            position: relative;
         }
         .nav-link:hover { color: #fff !important; }
         .nav-link.active { color: #fff !important; }
@@ -43,13 +44,21 @@
         }
         .navbar-cart-badge {
             background: #e8a045;
-            color: #fff;
+            color: #1a1a2e;
             border-radius: 50%;
             font-size: 0.65rem;
-            padding: 1px 5px;
-            position: relative;
-            top: -8px;
-            left: -5px;
+            padding: 2px 5px;
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            font-weight: 700;
+            min-width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(232,160,69,0.4);
+            line-height: 1;
         }
 
         /* ── Page wrapper ── */
@@ -99,15 +108,36 @@
                 </ul>
 
                 <ul class="navbar-nav ms-auto align-items-center gap-1">
-                    @auth
-                    @endauth
-
                     @if(session('user_id'))
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('wishlist.view') }}">❤️</a>
+                            <a class="nav-link position-relative" href="{{ route('wishlist.view') }}">
+                                ❤️
+                                @php
+                                    $wishlistCount = 0;
+                                    if(session('user_id')) {
+                                        $wishlistCount = \App\Models\Wishlist::where('user_id', session('user_id'))->count();
+                                    }
+                                @endphp
+                                @if($wishlistCount > 0)
+                                    <sup class="navbar-cart-badge">{{ $wishlistCount }}</sup>
+                                @endif
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('cart.view') }}">🛒</a>
+                            <a class="nav-link position-relative" href="{{ route('cart.view') }}">
+                                🛒
+                                @php
+                                    $cartCount = 0;
+                                    if(session('user_id')) {
+                                        $cartCount = \App\Models\CartItem::whereIn('cart_id', 
+                                            \App\Models\Cart::where('user_id', session('user_id'))->pluck('cart_id')
+                                        )->sum('quantity');
+                                    }
+                                @endphp
+                                @if($cartCount > 0)
+                                    <sup class="navbar-cart-badge">{{ $cartCount }}</sup>
+                                @endif
+                            </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('orders.history') }}">📦 Orders</a>

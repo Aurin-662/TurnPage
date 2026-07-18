@@ -1,0 +1,336 @@
+-- ============================================================================
+-- CSE 3109/3110: Database Systems Lab Project - Phase 1
+-- File: 7_categories_and_views.sql
+-- Purpose: Categories, Book-Category relationships, and Views (Labs 02-05)
+-- ============================================================================
+
+-- ─────────────────────────────────────────────────────────────────────────
+-- CLEANUP: Drop existing objects if the script is rerun
+-- ─────────────────────────────────────────────────────────────────────────
+
+BEGIN
+    EXECUTE IMMEDIATE 'DROP VIEW AUTHOR_BOOK_COUNT_VIEW';
+EXCEPTION
+    WHEN OTHERS THEN
+        IF SQLCODE != -942 THEN
+            RAISE;
+        END IF;
+END;
+/
+
+BEGIN
+    EXECUTE IMMEDIATE 'DROP VIEW CATEGORY_SUMMARY_VIEW';
+EXCEPTION
+    WHEN OTHERS THEN
+        IF SQLCODE != -942 THEN
+            RAISE;
+        END IF;
+END;
+/
+
+BEGIN
+    EXECUTE IMMEDIATE 'DROP VIEW HIGH_RATED_BOOKS_VIEW';
+EXCEPTION
+    WHEN OTHERS THEN
+        IF SQLCODE != -942 THEN
+            RAISE;
+        END IF;
+END;
+/
+
+BEGIN
+    EXECUTE IMMEDIATE 'DROP VIEW CATEGORY_BOOKS_VIEW';
+EXCEPTION
+    WHEN OTHERS THEN
+        IF SQLCODE != -942 THEN
+            RAISE;
+        END IF;
+END;
+/
+
+BEGIN
+    EXECUTE IMMEDIATE 'DROP VIEW NEW_ARRIVALS_VIEW';
+EXCEPTION
+    WHEN OTHERS THEN
+        IF SQLCODE != -942 THEN
+            RAISE;
+        END IF;
+END;
+/
+
+BEGIN
+    EXECUTE IMMEDIATE 'DROP VIEW BEST_SELLERS_VIEW';
+EXCEPTION
+    WHEN OTHERS THEN
+        IF SQLCODE != -942 THEN
+            RAISE;
+        END IF;
+END;
+/
+
+BEGIN
+    EXECUTE IMMEDIATE 'DROP VIEW FEATURED_BOOKS_VIEW';
+EXCEPTION
+    WHEN OTHERS THEN
+        IF SQLCODE != -942 THEN
+            RAISE;
+        END IF;
+END;
+/
+
+BEGIN
+    EXECUTE IMMEDIATE 'DROP TABLE BOOK_CATEGORY CASCADE CONSTRAINTS';
+EXCEPTION
+    WHEN OTHERS THEN
+        IF SQLCODE != -942 THEN
+            RAISE;
+        END IF;
+END;
+/
+
+BEGIN
+    EXECUTE IMMEDIATE 'DROP TABLE CATEGORY CASCADE CONSTRAINTS';
+EXCEPTION
+    WHEN OTHERS THEN
+        IF SQLCODE != -942 THEN
+            RAISE;
+        END IF;
+END;
+/
+
+-- ─────────────────────────────────────────────────────────────────────────
+-- STEP 1: CREATE CATEGORY TABLE (Lab 02: DDL - CREATE TABLE)
+-- ─────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE CATEGORY (
+    CATEGORY_ID    NUMBER(6)      NOT NULL,
+    CATEGORY_NAME  VARCHAR2(100)  NOT NULL,
+    DESCRIPTION    VARCHAR2(500),
+    ICON           VARCHAR2(50),
+    DISPLAY_ORDER  NUMBER         DEFAULT 0,
+    IS_ACTIVE      NUMBER(1)      DEFAULT 1,
+    CONSTRAINT CATEGORY_PK PRIMARY KEY (CATEGORY_ID),
+    CONSTRAINT UK_CATEGORY_NAME UNIQUE (CATEGORY_NAME),
+    CONSTRAINT CHK_CATEGORY_ACTIVE CHECK (IS_ACTIVE IN (0, 1))
+);
+
+-- ─────────────────────────────────────────────────────────────────────────
+-- STEP 2: CREATE BOOK_CATEGORY JUNCTION TABLE (Lab 03: Foreign Keys)
+-- ─────────────────────────────────────────────────────────────────────────
+
+CREATE TABLE BOOK_CATEGORY (
+    BOOK_CATEGORY_ID NUMBER(6) NOT NULL,
+    BOOK_ID          NUMBER(6) NOT NULL,
+    CATEGORY_ID      NUMBER(6) NOT NULL,
+    CONSTRAINT BOOK_CATEGORY_PK PRIMARY KEY (BOOK_CATEGORY_ID),
+    CONSTRAINT UK_BOOK_CATEGORY UNIQUE (BOOK_ID, CATEGORY_ID),
+    CONSTRAINT BOOK_CATEGORY_BOOK_FK FOREIGN KEY (BOOK_ID) 
+        REFERENCES BOOK(BOOK_ID) ON DELETE CASCADE,
+    CONSTRAINT BOOK_CATEGORY_CATEGORY_FK FOREIGN KEY (CATEGORY_ID) 
+        REFERENCES CATEGORY(CATEGORY_ID) ON DELETE CASCADE
+);
+
+-- ─────────────────────────────────────────────────────────────────────────
+-- STEP 3: INSERT SAMPLE CATEGORIES (Lab 02: DML - INSERT)
+-- ─────────────────────────────────────────────────────────────────────────
+
+INSERT INTO CATEGORY (CATEGORY_ID, CATEGORY_NAME, DESCRIPTION, ICON, DISPLAY_ORDER)
+VALUES (1, 'Fiction', 'Novels, Stories, and Literary Works', UNISTR('\D83D\DCD6'), 1);
+
+INSERT INTO CATEGORY (CATEGORY_ID, CATEGORY_NAME, DESCRIPTION, ICON, DISPLAY_ORDER)
+VALUES (2, 'Non-Fiction', 'Biography, History, Science, and Essays', UNISTR('\D83D\DCD9'), 2);
+
+INSERT INTO CATEGORY (CATEGORY_ID, CATEGORY_NAME, DESCRIPTION, ICON, DISPLAY_ORDER)
+VALUES (3, 'Self-Help', 'Personal Development and Wellness', UNISTR('\D83C\DF1F'), 3);
+
+INSERT INTO CATEGORY (CATEGORY_ID, CATEGORY_NAME, DESCRIPTION, ICON, DISPLAY_ORDER)
+VALUES (4, 'Children', 'Books for Kids and Young Readers', UNISTR('\D83C\DFA8'), 4);
+
+INSERT INTO CATEGORY (CATEGORY_ID, CATEGORY_NAME, DESCRIPTION, ICON, DISPLAY_ORDER)
+VALUES (5, 'Technology', 'Programming, AI, and Tech Books', UNISTR('\D83D\DCBB'), 5);
+
+INSERT INTO CATEGORY (CATEGORY_ID, CATEGORY_NAME, DESCRIPTION, ICON, DISPLAY_ORDER)
+VALUES (6, 'Business', 'Entrepreneurship, Management, Economics', UNISTR('\D83D\DCBC'), 6);
+
+INSERT INTO CATEGORY (CATEGORY_ID, CATEGORY_NAME, DESCRIPTION, ICON, DISPLAY_ORDER)
+VALUES (7, 'Bangla Literature', 'Bengali Language and Culture', UNISTR('\D83C\DDE7\D83C\DDE9'), 7);
+
+COMMIT;
+
+-- ─────────────────────────────────────────────────────────────────────────
+-- STEP 4: SAMPLE BOOK-CATEGORY ASSOCIATIONS
+-- ─────────────────────────────────────────────────────────────────────────
+
+-- Sample: Associate first book with Fiction and Bangla Literature
+INSERT INTO BOOK_CATEGORY (BOOK_CATEGORY_ID, BOOK_ID, CATEGORY_ID)
+SELECT 1, b.BOOK_ID, 1 FROM BOOK b WHERE b.BOOK_ID = 
+    (SELECT MIN(BOOK_ID) FROM BOOK WHERE ROWNUM = 1);
+
+COMMIT;
+
+-- ─────────────────────────────────────────────────────────────────────────
+-- STEP 5: CREATE VIEWS (Lab 05: CREATE VIEW)
+-- ─────────────────────────────────────────────────────────────────────────
+
+-- ─────────────────────────────────────────────────────────────────────────
+-- VIEW 1: FEATURED_BOOKS
+-- Shows top 8 highest-rated books (Lab 04: ORDER BY, LIMIT equivalent)
+-- ─────────────────────────────────────────────────────────────────────────
+
+CREATE OR REPLACE VIEW FEATURED_BOOKS_VIEW AS
+SELECT 
+    b.BOOK_ID,
+    b.TITLE,
+    b.PRICE,
+    b.STAR_RATING,
+    b.REVIEW_COUNT,
+    b.STOCK_QUANTITY,
+    a.AUTHOR_NAME,
+    p.PUBLISHER_NAME,
+    LISTAGG(c.CATEGORY_NAME, ', ') WITHIN GROUP (ORDER BY c.CATEGORY_NAME) AS CATEGORIES
+FROM BOOK b
+LEFT JOIN AUTHOR a ON b.AUTHOR_ID = a.AUTHOR_ID
+LEFT JOIN PUBLISHER p ON b.PUBLISHER_ID = p.PUBLISHER_ID
+LEFT JOIN BOOK_CATEGORY bc ON b.BOOK_ID = bc.BOOK_ID
+LEFT JOIN CATEGORY c ON bc.CATEGORY_ID = c.CATEGORY_ID
+WHERE b.STOCK_QUANTITY > 0 AND b.STAR_RATING >= 3.5
+GROUP BY b.BOOK_ID, b.TITLE, b.PRICE, b.STAR_RATING, b.REVIEW_COUNT, 
+         b.STOCK_QUANTITY, a.AUTHOR_NAME, p.PUBLISHER_NAME
+ORDER BY b.STAR_RATING DESC, b.REVIEW_COUNT DESC;
+
+-- ─────────────────────────────────────────────────────────────────────────
+-- VIEW 2: BEST_SELLERS_VIEW
+-- Uses GROUP BY and aggregate functions (Lab 04: GROUP BY, COUNT)
+-- ─────────────────────────────────────────────────────────────────────────
+
+CREATE OR REPLACE VIEW BEST_SELLERS_VIEW AS
+SELECT 
+    b.BOOK_ID,
+    b.TITLE,
+    b.PRICE,
+    b.STAR_RATING,
+    a.AUTHOR_NAME,
+    p.PUBLISHER_NAME,
+    COUNT(oi.ORDER_ITEM_ID) AS TOTAL_SOLD,
+    SUM(oi.QUANTITY) AS TOTAL_QUANTITY_SOLD
+FROM BOOK b
+LEFT JOIN AUTHOR a ON b.AUTHOR_ID = a.AUTHOR_ID
+LEFT JOIN PUBLISHER p ON b.PUBLISHER_ID = p.PUBLISHER_ID
+LEFT JOIN ORDER_ITEM oi ON b.BOOK_ID = oi.BOOK_ID
+WHERE b.STOCK_QUANTITY > 0
+GROUP BY b.BOOK_ID, b.TITLE, b.PRICE, b.STAR_RATING, a.AUTHOR_NAME, p.PUBLISHER_NAME
+HAVING COUNT(oi.ORDER_ITEM_ID) > 0
+ORDER BY TOTAL_QUANTITY_SOLD DESC;
+
+-- ─────────────────────────────────────────────────────────────────────────
+-- VIEW 3: NEW_ARRIVALS_VIEW
+-- Uses date functions (Lab 10: SYSDATE, TRUNC)
+-- ─────────────────────────────────────────────────────────────────────────
+
+CREATE OR REPLACE VIEW NEW_ARRIVALS_VIEW AS
+SELECT 
+    b.BOOK_ID,
+    b.TITLE,
+    b.PRICE,
+    b.STAR_RATING,
+    b.STOCK_QUANTITY,
+    a.AUTHOR_NAME,
+    p.PUBLISHER_NAME,
+    'NEW' AS BADGE
+FROM BOOK b
+LEFT JOIN AUTHOR a ON b.AUTHOR_ID = a.AUTHOR_ID
+LEFT JOIN PUBLISHER p ON b.PUBLISHER_ID = p.PUBLISHER_ID
+WHERE b.STOCK_QUANTITY > 0
+ORDER BY b.BOOK_ID DESC;
+
+-- ─────────────────────────────────────────────────────────────────────────
+-- VIEW 4: CATEGORY_BOOKS_VIEW
+-- Uses JOIN to connect books with categories (Lab 06: JOIN with category)
+-- ─────────────────────────────────────────────────────────────────────────
+
+CREATE OR REPLACE VIEW CATEGORY_BOOKS_VIEW AS
+SELECT 
+    c.CATEGORY_ID,
+    c.CATEGORY_NAME,
+    c.ICON,
+    b.BOOK_ID,
+    b.TITLE,
+    b.PRICE,
+    b.STAR_RATING,
+    b.REVIEW_COUNT,
+    b.STOCK_QUANTITY,
+    a.AUTHOR_NAME
+FROM CATEGORY c
+INNER JOIN BOOK_CATEGORY bc ON c.CATEGORY_ID = bc.CATEGORY_ID
+INNER JOIN BOOK b ON bc.BOOK_ID = b.BOOK_ID
+LEFT JOIN AUTHOR a ON b.AUTHOR_ID = a.AUTHOR_ID
+WHERE c.IS_ACTIVE = 1 AND b.STOCK_QUANTITY > 0
+ORDER BY c.DISPLAY_ORDER, b.STAR_RATING DESC;
+
+-- ─────────────────────────────────────────────────────────────────────────
+-- VIEW 5: HIGH_RATED_BOOKS_VIEW (Lab 04: HAVING clause with aggregates)
+-- Shows books with average rating >= 4.0 and at least 3 reviews
+-- ─────────────────────────────────────────────────────────────────────────
+
+CREATE OR REPLACE VIEW HIGH_RATED_BOOKS_VIEW AS
+SELECT 
+    b.BOOK_ID,
+    b.TITLE,
+    b.PRICE,
+    b.STAR_RATING,
+    b.REVIEW_COUNT,
+    a.AUTHOR_NAME,
+    p.PUBLISHER_NAME,
+    ROUND(AVG(r.RATING), 2) AS AVERAGE_RATING
+FROM BOOK b
+LEFT JOIN AUTHOR a ON b.AUTHOR_ID = a.AUTHOR_ID
+LEFT JOIN PUBLISHER p ON b.PUBLISHER_ID = p.PUBLISHER_ID
+LEFT JOIN REVIEW r ON b.BOOK_ID = r.BOOK_ID
+GROUP BY b.BOOK_ID, b.TITLE, b.PRICE, b.STAR_RATING, b.REVIEW_COUNT, 
+         a.AUTHOR_NAME, p.PUBLISHER_NAME
+HAVING COUNT(r.REVIEW_ID) >= 3 AND AVG(r.RATING) >= 4.0
+ORDER BY AVERAGE_RATING DESC;
+
+-- ─────────────────────────────────────────────────────────────────────────
+-- VIEW 6: CATEGORY_SUMMARY_VIEW (Lab 04: GROUP BY with COUNT/SUM)
+-- Shows category statistics
+-- ─────────────────────────────────────────────────────────────────────────
+
+CREATE OR REPLACE VIEW CATEGORY_SUMMARY_VIEW AS
+SELECT 
+    c.CATEGORY_ID,
+    c.CATEGORY_NAME,
+    c.ICON,
+    c.DISPLAY_ORDER,
+    COUNT(DISTINCT bc.BOOK_ID) AS TOTAL_BOOKS,
+    SUM(b.STOCK_QUANTITY) AS TOTAL_STOCK,
+    ROUND(AVG(b.PRICE), 2) AS AVG_PRICE,
+    MIN(b.PRICE) AS MIN_PRICE,
+    MAX(b.PRICE) AS MAX_PRICE
+FROM CATEGORY c
+LEFT JOIN BOOK_CATEGORY bc ON c.CATEGORY_ID = bc.CATEGORY_ID
+LEFT JOIN BOOK b ON bc.BOOK_ID = b.BOOK_ID
+WHERE c.IS_ACTIVE = 1
+GROUP BY c.CATEGORY_ID, c.CATEGORY_NAME, c.ICON, c.DISPLAY_ORDER
+ORDER BY c.DISPLAY_ORDER;
+
+-- ─────────────────────────────────────────────────────────────────────────
+-- VIEW 7: AUTHOR_BOOK_COUNT_VIEW (Lab 04: GROUP BY with aggregate)
+-- Shows authors and their book count
+-- ─────────────────────────────────────────────────────────────────────────
+
+CREATE OR REPLACE VIEW AUTHOR_BOOK_COUNT_VIEW AS
+SELECT 
+    a.AUTHOR_ID,
+    a.AUTHOR_NAME,
+    a.COUNTRY,
+    COUNT(b.BOOK_ID) AS TOTAL_BOOKS,
+    ROUND(AVG(b.PRICE), 2) AS AVG_BOOK_PRICE,
+    ROUND(AVG(b.STAR_RATING), 2) AS AVG_RATING
+FROM AUTHOR a
+LEFT JOIN BOOK b ON a.AUTHOR_ID = b.AUTHOR_ID
+GROUP BY a.AUTHOR_ID, a.AUTHOR_NAME, a.COUNTRY
+HAVING COUNT(b.BOOK_ID) > 0
+ORDER BY COUNT(b.BOOK_ID) DESC;
+
+COMMIT;

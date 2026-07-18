@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Book;
-use App\Models\Author;
 use Illuminate\Http\Request;
 
 class BookController extends Controller
@@ -54,20 +53,35 @@ class BookController extends Controller
         }
 
         $books = $query->get();
+        $featuredBookIds = [1, 4, 6];
 
-        return view('books.index', compact('books'));
+        return view('books.index', compact('books', 'featuredBookIds'));
     }
 
-    /*public function show($id)
+    public function show($id)
     {
         $book = Book::with('author', 'publisher')->findOrFail($id);
-        return view('books.show', compact('book'));
-    }*/
-
-    public function show($id)
-{
-    $book = Book::with('author', 'publisher')->findOrFail($id);
-    $reviews = \App\Models\Review::with('user')->where('book_id', $id)->orderBy('review_date', 'desc')->get();
-    return view('books.show', compact('book', 'reviews'));
-}
+        $reviews = \App\Models\Review::with('user')->where('book_id', $id)->orderBy('review_date', 'desc')->get();
+        
+        // Get related books by same author or publisher, limit to 8
+        $relatedBooks = Book::with('author', 'publisher')
+            ->where('book_id', '!=', $id)
+            ->where(function($query) use ($book) {
+                $query->where('author_id', $book->author_id)
+                      ->orWhere('publisher_id', $book->publisher_id);
+            })
+            ->limit(8)
+            ->get();
+        
+        // If no related books by author/publisher, get top rated books
+        if ($relatedBooks->count() === 0) {
+            $relatedBooks = Book::with('author', 'publisher')
+                ->where('book_id', '!=', $id)
+                ->orderBy('star_rating', 'DESC')
+                ->limit(8)
+                ->get();
+        }
+        
+        return view('books.show', compact('book', 'reviews', 'relatedBooks'));
+    }
 }
