@@ -37,7 +37,14 @@
     <div class="row g-5 mt-1 reveal-on-scroll">
         <!-- Book Cover -->
         <div class="col-md-4">
-            <div class="book-cover-large">📖</div>
+            <div class="rounded-4 shadow-sm position-relative overflow-hidden" style="height: 380px; width: 100%; background: linear-gradient(135deg, #e8e0d5, #d4c9bb);">
+                <div class="d-flex align-items-center justify-content-center h-100 w-100" style="font-size: 5rem; color: #6b7280; position: absolute; inset: 0;">
+                    📖
+                </div>
+                @if($book->has_cover)
+                    <img src="{{ $book->cover_url }}" alt="{{ $book->title }}" class="img-fluid" style="height: 100%; width: 100%; object-fit: cover; position: absolute; inset: 0;" onerror="this.onerror=null;this.style.display='none'">
+                @endif
+            </div>
         </div>
 
         <!-- Book Details -->
@@ -93,7 +100,14 @@
         @foreach($relatedBooks as $relBook)
         <div class="col-md-3">
             <div class="book-card" style="background: #fff; border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,0.07); transition: transform 0.2s; height: 100%;">
-                <div class="book-cover" style="height: 200px; background: linear-gradient(135deg, #e8e0d5, #d4c9bb); border-radius: 10px 10px 0 0; display: flex; align-items: center; justify-content: center; font-size: 3rem;">📖</div>
+                <div class="book-cover" style="height: 200px; overflow: hidden; border-radius: 10px 10px 0 0; position: relative; background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%);">
+                    <div class="d-flex align-items-center justify-content-center h-100 w-100" style="font-size: 3rem; color: #6b7280; position: absolute; inset: 0;">
+                        📖
+                    </div>
+                    @if($relBook->has_cover ?? false)
+                        <img src="{{ $relBook->cover_url }}" alt="{{ $relBook->title }}" class="img-fluid h-100 w-100" style="object-fit: cover; position: absolute; inset: 0;" onerror="this.style.display='none'">
+                    @endif
+                </div>
                 <div class="p-3">
                     <p class="book-title mb-1">{{ $relBook->title }}</p>
                     <p class="book-author mb-2" style="color: #888; font-size: 0.82rem;">{{ $relBook->author->author_name ?? 'Unknown' }}</p>

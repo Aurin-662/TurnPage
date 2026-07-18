@@ -375,16 +375,33 @@
 @section('scripts')
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('is-visible');
-                    observer.unobserve(entry.target);
-                }
-            });
-        }, { threshold: 0.15 });
+        // Use IntersectionObserver when available, otherwise reveal immediately.
+        const revealElements = Array.from(document.querySelectorAll('.reveal-on-scroll'));
 
-        document.querySelectorAll('.reveal-on-scroll').forEach(el => observer.observe(el));
+        if ('IntersectionObserver' in window) {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.15 });
+
+            revealElements.forEach(el => observer.observe(el));
+
+            // Safety net: if observer didn't mark elements after a short delay, reveal them.
+            setTimeout(() => {
+                revealElements.forEach(el => {
+                    if (!el.classList.contains('is-visible')) {
+                        el.classList.add('is-visible');
+                    }
+                });
+            }, 300);
+        } else {
+            // Fallback for very old browsers or environments without IntersectionObserver
+            revealElements.forEach(el => el.classList.add('is-visible'));
+        }
     });
 </script>
 @endsection
@@ -510,9 +527,15 @@
         @foreach($newArrivals->take(4) as $book)
         <div class="col-md-3">
             <div class="book-card">
-                <div class="book-cover">
+                <div class="book-cover overflow-hidden">
+                    @if($book->has_cover)
+                        <img src="{{ $book->cover_url }}" alt="{{ $book->title }}" class="img-fluid h-100 w-100" style="object-fit: cover; position: absolute; inset: 0;" onerror="this.onerror=null;this.style.display='none'">
+                    @else
+                        <div class="d-flex align-items-center justify-content-center h-100 w-100" style="font-size: 3rem; color: #6b7280; background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%);">
+                            📖
+                        </div>
+                    @endif
                     <span class="book-badge">New</span>
-                    📖
                 </div>
                 <div class="p-3">
                     <p class="book-title">{{ $book->title }}</p>
@@ -539,9 +562,14 @@
         @forelse($featuredBooks as $book)
         <div class="col-md-3">
             <div class="book-card">
-                <div class="book-cover">
+                <div class="book-cover overflow-hidden" style="position: relative;">
+                    <div class="d-flex align-items-center justify-content-center h-100 w-100" style="font-size: 3rem; color: #6b7280; background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%); position: absolute; inset: 0;">
+                        📖
+                    </div>
+                    @if($book->has_cover)
+                        <img src="{{ $book->cover_url }}" alt="{{ $book->title }}" class="img-fluid h-100 w-100" style="object-fit: cover; position: absolute; inset: 0;" onerror="this.onerror=null;this.style.display='none'">
+                    @endif
                     <span class="book-badge">Featured</span>
-                    📖
                 </div>
                 <div class="p-3">
                     <p class="book-title">{{ $book->title }}</p>
@@ -598,9 +626,14 @@
         @foreach($bestSellers->take(8) as $book)
         <div class="col-md-3">
             <div class="book-card">
-                <div class="book-cover">
+                <div class="book-cover overflow-hidden" style="position: relative;">
+                    <div class="d-flex align-items-center justify-content-center h-100 w-100" style="font-size: 3rem; color: #6b7280; background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%); position: absolute; inset: 0;">
+                        📖
+                    </div>
+                    @if($book->has_cover)
+                        <img src="{{ $book->cover_url }}" alt="{{ $book->title }}" class="img-fluid h-100 w-100" style="object-fit: cover; position: absolute; inset: 0;" onerror="this.onerror=null;this.style.display='none'">
+                    @endif
                     <span class="book-badge">Bestseller</span>
-                    📖
                 </div>
                 <div class="p-3">
                     <p class="book-title">{{ $book->title }}</p>
@@ -628,9 +661,14 @@
         @foreach($newArrivals->take(8) as $book)
         <div class="col-md-3">
             <div class="book-card">
-                <div class="book-cover">
+                <div class="book-cover overflow-hidden" style="position: relative;">
+                    <div class="d-flex align-items-center justify-content-center h-100 w-100" style="font-size: 3rem; color: #6b7280; background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%); position: absolute; inset: 0;">
+                        📖
+                    </div>
+                    @if($book->has_cover)
+                        <img src="{{ $book->cover_url }}" alt="{{ $book->title }}" class="img-fluid h-100 w-100" style="object-fit: cover; position: absolute; inset: 0;" onerror="this.onerror=null;this.style.display='none'">
+                    @endif
                     <span class="book-badge">Popular</span>
-                    📖
                 </div>
                 <div class="p-3">
                     <p class="book-title">{{ $book->title }}</p>

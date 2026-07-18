@@ -11,10 +11,27 @@ use Illuminate\Http\Request;
 class BookController extends Controller
 {
     // List all books
-    public function index()
+    public function index(Request $request)
     {
-        $books = Book::with('author', 'publisher')->orderBy('book_id', 'desc')->get();
-        return view('admin.books.index', compact('books'));
+        $search = trim($request->query('search', ''));
+
+        $books = Book::with('author', 'publisher')
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(function ($bookQuery) use ($search) {
+                    $bookQuery->where('title', 'like', "%{$search}%")
+                        ->orWhere('isbn', 'like', "%{$search}%")
+                        ->orWhereHas('author', function ($authorQuery) use ($search) {
+                            $authorQuery->where('author_name', 'like', "%{$search}%");
+                        })
+                        ->orWhereHas('publisher', function ($publisherQuery) use ($search) {
+                            $publisherQuery->where('publisher_name', 'like', "%{$search}%");
+                        });
+                });
+            })
+            ->orderBy('book_id', 'desc')
+            ->get();
+
+        return view('admin.books.index', compact('books', 'search')); 
     }
 
     // Show create form

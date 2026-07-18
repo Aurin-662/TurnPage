@@ -94,7 +94,14 @@
                 @forelse($books as $book)
                 <div class="col-md-4">
                     <div class="book-card">
-                        <div class="book-cover">📖</div>
+                        <div class="book-cover overflow-hidden" style="position: relative;">
+                            <div class="d-flex align-items-center justify-content-center h-100 w-100" style="font-size: 3rem; color: #6b7280; background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%); position: absolute; inset: 0;">
+                                📖
+                            </div>
+                            @if($book->has_cover)
+                                <img src="{{ $book->cover_url }}" alt="{{ $book->title }}" class="img-fluid h-100 w-100" style="object-fit: cover; position: absolute; inset: 0;" onerror="this.onerror=null;this.style.display='none'">
+                            @endif
+                        </div>
                         <div class="p-3">
                             @if(in_array((int) $book->book_id, $featuredBookIds ?? []))
                                 <span class="book-badge">Popular</span>

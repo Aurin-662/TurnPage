@@ -11,8 +11,18 @@
 
 @section('content')
 <div class="container mt-4 pb-5">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 style="font-family:'Inter',sans-serif; font-weight:700;">Manage Books</h2>
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4 gap-3">
+        <div>
+            <h2 style="font-family:'Inter',sans-serif; font-weight:700;">Manage Books</h2>
+            <p class="text-muted mb-0">Search by book title, ISBN, author, or publisher.</p>
+        </div>
+        <div class="d-flex gap-2 w-100 w-md-auto">
+            <form action="{{ route('admin.books.index') }}" method="GET" class="d-flex gap-2 w-100">
+                <input type="search" name="search" class="form-control form-control-sm" placeholder="Search books..." value="{{ $search ?? request('search') }}">
+                <button type="submit" class="btn btn-dark btn-sm">Search</button>
+            </form>
+            <a href="{{ route('admin.books.index') }}" class="btn btn-outline-secondary btn-sm">Reset</a>
+        </div>
         <a href="{{ route('admin.books.create') }}" class="btn btn-dark">+ Add New Book</a>
     </div>
 

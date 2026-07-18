@@ -100,7 +100,6 @@
                     <div class="book-card">
                         <div class="book-cover">📖</div>
                         <div class="p-3">
-                            <span class="book-badge">Category Pick</span>
                             <p class="book-title mb-1">{{ $book->title }}</p>
                             <p class="book-author mb-2">{{ $book->author_name ?? 'Unknown' }}</p>
                             <p class="star-rating mb-2">★ {{ $book->star_rating }}
