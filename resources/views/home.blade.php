@@ -158,42 +158,54 @@
     }
     .promo-badge {
         display: inline-block;
-        background: #e8a045;
+        background: linear-gradient(135deg, #f7c36a 0%, #e8a045 100%);
         color: #111827;
         padding: 7px 14px;
         border-radius: 999px;
-        font-size: 0.8rem;
+        font-size: 0.78rem;
         font-weight: 700;
         margin-bottom: 16px;
         text-transform: uppercase;
-        letter-spacing: 0.04em;
+        letter-spacing: 0.06em;
+        box-shadow: 0 6px 16px rgba(232, 160, 69, 0.22);
     }
     .deal-hero {
+        position: relative;
         display: grid;
-        grid-template-columns: 120px minmax(0, 1fr);
-        gap: 18px;
-        background: linear-gradient(135deg, #111827 0%, #121b2b 100%);
-        border-radius: 24px;
-        padding: 20px;
+        grid-template-columns: 150px minmax(0, 1fr);
+        gap: 20px;
+        background: linear-gradient(135deg, #111827 0%, #1f2937 55%, #263449 100%);
+        border: 1px solid rgba(255,255,255,0.12);
+        border-radius: 28px;
+        padding: 22px;
         color: #fff;
-        box-shadow: 0 14px 32px rgba(17, 24, 39, 0.14);
-        align-items: stretch;
+        box-shadow: 0 16px 36px rgba(17, 24, 39, 0.16);
+        align-items: center;
+        overflow: hidden;
+    }
+    .deal-hero::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at top right, rgba(232, 160, 69, 0.18), transparent 38%);
+        pointer-events: none;
     }
     .deal-hero-content {
+        position: relative;
         min-width: 0;
     }
     .deal-hero-content h3 {
         font-family: 'Merriweather', serif;
-        font-size: 1.4rem;
+        font-size: 1.55rem;
         margin-bottom: 10px;
         line-height: 1.2;
         letter-spacing: -0.02em;
     }
     .deal-hero-content p {
-        color: #d1d5e0;
+        color: #dce3ef;
         margin-bottom: 10px;
         font-size: 0.95rem;
-        line-height: 1.5;
+        line-height: 1.55;
     }
     .deal-topline {
         display: flex;
@@ -206,25 +218,49 @@
         display: inline-flex;
         align-items: center;
         gap: 6px;
-        color: #cbd5e0;
+        color: #d8e2f0;
         font-size: 0.9rem;
+    }
+    .deal-meta-stack {
+        display: grid;
+        gap: 8px;
+        margin: 12px 0 14px;
+    }
+    .deal-price-box {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        width: fit-content;
+        padding: 8px 12px;
+        background: rgba(255,255,255,0.12);
+        border: 1px solid rgba(255,255,255,0.16);
+        border-radius: 999px;
+    }
+    .deal-price-label {
+        color: #f7d9a2;
+        font-size: 0.78rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
     }
     .deal-hero-actions {
         display: flex;
         align-items: center;
         gap: 10px;
         flex-wrap: wrap;
-        margin-top: 14px;
+        margin-top: 16px;
     }
     .deal-cover {
-        width: 120px;
-        height: 176px;
-        border-radius: 20px;
+        position: relative;
+        width: 150px;
+        height: 210px;
+        border-radius: 22px;
         background: #f8f8f8;
         overflow: hidden;
         display: flex;
         align-items: center;
         justify-content: center;
+        box-shadow: 0 12px 24px rgba(0,0,0,0.18);
     }
     .deal-cover img {
         width: 100%;
@@ -238,8 +274,21 @@
         width: 100%;
         height: 100%;
         color: #6b7280;
-        font-size: 3rem;
+        font-size: 3.2rem;
         background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%);
+    }
+    .deal-cover-badge {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        padding: 5px 9px;
+        border-radius: 999px;
+        background: rgba(17,24,39,0.82);
+        color: #fff;
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
     }
     .deal-price-pill {
         background: #fff;
@@ -247,7 +296,7 @@
         padding: 7px 12px;
         border-radius: 999px;
         font-weight: 700;
-        font-size: 0.9rem;
+        font-size: 0.92rem;
         white-space: nowrap;
     }
     .deal-pill-row {
@@ -258,10 +307,11 @@
     }
     .deal-pill-row span {
         background: rgba(255,255,255,0.12);
-        padding: 5px 9px;
+        padding: 6px 10px;
         border-radius: 999px;
-        font-size: 0.75rem;
+        font-size: 0.76rem;
         color: #f5f7fa;
+        border: 1px solid rgba(255,255,255,0.12);
     }
     @media (max-width: 960px) {
         .deal-hero {
@@ -464,8 +514,12 @@
             @if($dealOfTheDay)
             <div class="deal-hero">
                 <div class="deal-cover">
-                    @if(!empty($dealOfTheDay->image))
-                        <img src="{{ asset($dealOfTheDay->image) }}" alt="{{ $dealOfTheDay->title }} cover">
+                    <div class="deal-cover-badge">Today’s Pick</div>
+                    @php
+                        $dealImage = $dealOfTheDay->cover_url ?? $dealOfTheDay->image ?? null;
+                    @endphp
+                    @if(!empty($dealImage))
+                        <img src="{{ $dealImage }}" alt="{{ $dealOfTheDay->title }} cover">
                     @else
                         <div class="deal-cover-placeholder">📖</div>
                     @endif
@@ -474,13 +528,20 @@
                     <div class="promo-badge">Deal of the Day</div>
                     <h3>{{ $dealOfTheDay->title }}</h3>
                     <div class="deal-topline">
-                        <span>By {{ $dealOfTheDay->author_name ?? 'Popular author' }}</span>
-                        <span class="deal-price-pill">Tk. {{ number_format($dealOfTheDay->price ?? 0, 0) }}</span>
+                        <span>✍️ {{ $dealOfTheDay->author_name ?? 'Popular author' }}</span>
+                        <span>⭐ {{ number_format($dealOfTheDay->star_rating ?? 0, 1) }}/5</span>
                     </div>
-                    <p>Rated {{ $dealOfTheDay->star_rating ?? 0 }}/5</p>
+                    <div class="deal-meta-stack">
+                        <div class="deal-price-box">
+                            <span class="deal-price-label">Special Price</span>
+                            <span class="deal-price-pill">Tk. {{ number_format($dealOfTheDay->price ?? 0, 0) }}</span>
+                        </div>
+                        <p>Handpicked for readers who want a standout title with strong reviews, premium presentation, and a smooth shopping experience.</p>
+                    </div>
                     <div class="deal-pill-row">
                         <span>⚡ Limited offer</span>
                         <span>📦 In stock</span>
+                        <span>🚚 Fast delivery</span>
                     </div>
                     <div class="deal-hero-actions">
                         <a href="{{ route('books.show', $dealOfTheDay->book_id) }}" class="btn btn-dark">Grab This Book</a>

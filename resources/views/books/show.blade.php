@@ -92,43 +92,6 @@
 
     <hr class="section-divider">
 
-    <!-- Related Products Section -->
-    <h3 class="mb-4" style="font-family:'Merriweather',serif;">You Might Also Like</h3>
-    
-    @if($relatedBooks && $relatedBooks->count() > 0)
-    <div class="row g-4 mb-5">
-        @foreach($relatedBooks as $relBook)
-        <div class="col-md-3">
-            <div class="book-card" style="background: #fff; border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,0.07); transition: transform 0.2s; height: 100%;">
-                <div class="book-cover" style="height: 200px; overflow: hidden; border-radius: 10px 10px 0 0; position: relative; background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%);">
-                    <div class="d-flex align-items-center justify-content-center h-100 w-100" style="font-size: 3rem; color: #6b7280; position: absolute; inset: 0;">
-                        📖
-                    </div>
-                    @if($relBook->has_cover ?? false)
-                        <img src="{{ $relBook->cover_url }}" alt="{{ $relBook->title }}" class="img-fluid h-100 w-100" style="object-fit: cover; position: absolute; inset: 0;" onerror="this.style.display='none'">
-                    @endif
-                </div>
-                <div class="p-3">
-                    <p class="book-title mb-1">{{ $relBook->title }}</p>
-                    <p class="book-author mb-2" style="color: #888; font-size: 0.82rem;">{{ $relBook->author->author_name ?? 'Unknown' }}</p>
-                    <p class="star-rating mb-2" style="color: #e8a045; font-size: 0.85rem;">★ {{ $relBook->star_rating }}
-                        <small class="text-muted">({{ $relBook->review_count }})</small>
-                    </p>
-                    <div class="d-flex justify-content-between align-items-center">
-                        <span class="book-price" style="color: #c0392b; font-weight: 700;">Tk. {{ number_format($relBook->price, 0) }}</span>
-                        <a href="{{ route('books.show', $relBook->book_id) }}" class="btn btn-sm btn-outline-dark">View</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        @endforeach
-    </div>
-    @else
-    <p class="text-muted mb-5">No related books available.</p>
-    @endif
-
-    <hr class="section-divider">
-
     <!-- Review Section -->
     <h3 class="mb-4" style="font-family:'Merriweather',serif;">Customer Reviews</h3>
 
@@ -178,6 +141,43 @@
     @empty
     <p class="text-muted">No reviews yet. Be the first!</p>
     @endforelse
+
+    <hr class="section-divider">
+
+    <!-- Related Products Section -->
+    <h3 class="mb-4" style="font-family:'Merriweather',serif;">You Might Also Like</h3>
+    
+    @if($relatedBooks && $relatedBooks->count() > 0)
+    <div class="row g-4 mb-5">
+        @foreach($relatedBooks as $relBook)
+        <div class="col-md-3">
+            <div class="book-card" style="background: #fff; border-radius: 10px; box-shadow: 0 2px 12px rgba(0,0,0,0.07); transition: transform 0.2s; height: 100%;">
+                <div class="book-cover" style="height: 200px; overflow: hidden; border-radius: 10px 10px 0 0; position: relative; background: linear-gradient(135deg, #e5e7eb 0%, #d1d5db 100%);">
+                    <div class="d-flex align-items-center justify-content-center h-100 w-100" style="font-size: 3rem; color: #6b7280; position: absolute; inset: 0;">
+                        📖
+                    </div>
+                    @if($relBook->has_cover ?? false)
+                        <img src="{{ $relBook->cover_url }}" alt="{{ $relBook->title }}" class="img-fluid h-100 w-100" style="object-fit: cover; position: absolute; inset: 0;" onerror="this.style.display='none'">
+                    @endif
+                </div>
+                <div class="p-3">
+                    <p class="book-title mb-1">{{ $relBook->title }}</p>
+                    <p class="book-author mb-2" style="color: #888; font-size: 0.82rem;">{{ $relBook->author->author_name ?? 'Unknown' }}</p>
+                    <p class="star-rating mb-2" style="color: #e8a045; font-size: 0.85rem;">★ {{ $relBook->star_rating }}
+                        <small class="text-muted">({{ $relBook->review_count }})</small>
+                    </p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="book-price" style="color: #c0392b; font-weight: 700;">Tk. {{ number_format($relBook->price, 0) }}</span>
+                        <a href="{{ route('books.show', $relBook->book_id) }}" class="btn btn-sm btn-outline-dark">View</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @endforeach
+    </div>
+    @else
+    <p class="text-muted mb-5">No related books available.</p>
+    @endif
 
 </div>
 @endsection

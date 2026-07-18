@@ -249,8 +249,10 @@ class HomeController extends Controller
 
         return $collection->map(function ($item) use ($books) {
             $book = $books->get($item->book_id);
-            $item->cover_url = $book ? $book->cover_url : null;
-            $item->has_cover = $book ? $book->has_cover : false;
+            $coverUrl = $book ? $book->cover_url : null;
+            $item->cover_url = $coverUrl;
+            $item->has_cover = !empty($coverUrl);
+            $item->image = $coverUrl ?? $item->image ?? null;
             return $item;
         });
     }

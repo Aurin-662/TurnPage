@@ -22,7 +22,17 @@
         <div class="col-md-8">
             @foreach($cartItems as $item)
             <div class="cart-card reveal-on-scroll d-flex gap-3 align-items-center">
-                <div class="cart-book-cover">📖</div>
+                @php
+                    $cartCover = null;
+                    if (!empty($item->book)) {
+                        $cartCover = $item->book->cover_url ?? null;
+                    }
+                @endphp
+                @if(!empty($cartCover))
+                    <img src="{{ $cartCover }}" alt="{{ $item->book->title ?? 'Book cover' }}" class="img-fluid rounded" style="width:70px;height:90px;object-fit:cover;flex-shrink:0;">
+                @else
+                    <div class="cart-book-cover">📖</div>
+                @endif
                 <div class="flex-grow-1">
                     <h6 class="mb-1">{{ $item->book->title ?? 'Unknown' }}</h6>
                     <p class="text-muted small mb-2">Tk. {{ number_format($item->price, 2) }} each</p>
