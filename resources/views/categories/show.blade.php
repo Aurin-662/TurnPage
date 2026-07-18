@@ -19,7 +19,6 @@
     .book-cover { height: 200px; background: linear-gradient(135deg, #e8e0d5, #d4c9bb); border-radius: 10px 10px 0 0; display: flex; align-items: center; justify-content: center; font-size: 3rem; }
     .book-title { font-weight: 600; font-size: 0.95rem; }
     .book-author { color: #888; font-size: 0.82rem; }
-    .book-badge { display: inline-block; background: #e8a045; color: #fff; padding: 4px 8px; border-radius: 999px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 10px; }
     .book-price { color: #c0392b; font-weight: 700; }
     .star-rating { color: #e8a045; font-size: 0.85rem; }
 

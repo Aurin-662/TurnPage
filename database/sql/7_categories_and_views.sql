@@ -5,98 +5,13 @@
 -- ============================================================================
 
 -- ─────────────────────────────────────────────────────────────────────────
--- CLEANUP: Drop existing objects if the script is rerun
+-- CLEANUP: drop the category tables from the earlier run so they can be
+-- rebuilt cleanly (also drops BOOK_CATEGORY first since it references
+-- CATEGORY and BOOK).
 -- ─────────────────────────────────────────────────────────────────────────
 
-BEGIN
-    EXECUTE IMMEDIATE 'DROP VIEW AUTHOR_BOOK_COUNT_VIEW';
-EXCEPTION
-    WHEN OTHERS THEN
-        IF SQLCODE != -942 THEN
-            RAISE;
-        END IF;
-END;
-/
-
-BEGIN
-    EXECUTE IMMEDIATE 'DROP VIEW CATEGORY_SUMMARY_VIEW';
-EXCEPTION
-    WHEN OTHERS THEN
-        IF SQLCODE != -942 THEN
-            RAISE;
-        END IF;
-END;
-/
-
-BEGIN
-    EXECUTE IMMEDIATE 'DROP VIEW HIGH_RATED_BOOKS_VIEW';
-EXCEPTION
-    WHEN OTHERS THEN
-        IF SQLCODE != -942 THEN
-            RAISE;
-        END IF;
-END;
-/
-
-BEGIN
-    EXECUTE IMMEDIATE 'DROP VIEW CATEGORY_BOOKS_VIEW';
-EXCEPTION
-    WHEN OTHERS THEN
-        IF SQLCODE != -942 THEN
-            RAISE;
-        END IF;
-END;
-/
-
-BEGIN
-    EXECUTE IMMEDIATE 'DROP VIEW NEW_ARRIVALS_VIEW';
-EXCEPTION
-    WHEN OTHERS THEN
-        IF SQLCODE != -942 THEN
-            RAISE;
-        END IF;
-END;
-/
-
-BEGIN
-    EXECUTE IMMEDIATE 'DROP VIEW BEST_SELLERS_VIEW';
-EXCEPTION
-    WHEN OTHERS THEN
-        IF SQLCODE != -942 THEN
-            RAISE;
-        END IF;
-END;
-/
-
-BEGIN
-    EXECUTE IMMEDIATE 'DROP VIEW FEATURED_BOOKS_VIEW';
-EXCEPTION
-    WHEN OTHERS THEN
-        IF SQLCODE != -942 THEN
-            RAISE;
-        END IF;
-END;
-/
-
-BEGIN
-    EXECUTE IMMEDIATE 'DROP TABLE BOOK_CATEGORY CASCADE CONSTRAINTS';
-EXCEPTION
-    WHEN OTHERS THEN
-        IF SQLCODE != -942 THEN
-            RAISE;
-        END IF;
-END;
-/
-
-BEGIN
-    EXECUTE IMMEDIATE 'DROP TABLE CATEGORY CASCADE CONSTRAINTS';
-EXCEPTION
-    WHEN OTHERS THEN
-        IF SQLCODE != -942 THEN
-            RAISE;
-        END IF;
-END;
-/
+DROP TABLE BOOK_CATEGORY CASCADE CONSTRAINTS;
+DROP TABLE CATEGORY CASCADE CONSTRAINTS;
 
 -- ─────────────────────────────────────────────────────────────────────────
 -- STEP 1: CREATE CATEGORY TABLE (Lab 02: DDL - CREATE TABLE)
@@ -135,25 +50,25 @@ CREATE TABLE BOOK_CATEGORY (
 -- ─────────────────────────────────────────────────────────────────────────
 
 INSERT INTO CATEGORY (CATEGORY_ID, CATEGORY_NAME, DESCRIPTION, ICON, DISPLAY_ORDER)
-VALUES (1, 'Fiction', 'Novels, Stories, and Literary Works', UNISTR('\D83D\DCD6'), 1);
+VALUES (1, 'Fiction', 'Novels, Stories, and Literary Works', 'Fiction', 1);
 
 INSERT INTO CATEGORY (CATEGORY_ID, CATEGORY_NAME, DESCRIPTION, ICON, DISPLAY_ORDER)
-VALUES (2, 'Non-Fiction', 'Biography, History, Science, and Essays', UNISTR('\D83D\DCD9'), 2);
+VALUES (2, 'Non-Fiction', 'Biography, History, Science, and Essays', 'Non-Fiction', 2);
 
 INSERT INTO CATEGORY (CATEGORY_ID, CATEGORY_NAME, DESCRIPTION, ICON, DISPLAY_ORDER)
-VALUES (3, 'Self-Help', 'Personal Development and Wellness', UNISTR('\D83C\DF1F'), 3);
+VALUES (3, 'Self-Help', 'Personal Development and Wellness', 'Self-Help', 3);
 
 INSERT INTO CATEGORY (CATEGORY_ID, CATEGORY_NAME, DESCRIPTION, ICON, DISPLAY_ORDER)
-VALUES (4, 'Children', 'Books for Kids and Young Readers', UNISTR('\D83C\DFA8'), 4);
+VALUES (4, 'Children', 'Books for Kids and Young Readers', 'Children', 4);
 
 INSERT INTO CATEGORY (CATEGORY_ID, CATEGORY_NAME, DESCRIPTION, ICON, DISPLAY_ORDER)
-VALUES (5, 'Technology', 'Programming, AI, and Tech Books', UNISTR('\D83D\DCBB'), 5);
+VALUES (5, 'Technology', 'Programming, AI, and Tech Books', 'Technology', 5);
 
 INSERT INTO CATEGORY (CATEGORY_ID, CATEGORY_NAME, DESCRIPTION, ICON, DISPLAY_ORDER)
-VALUES (6, 'Business', 'Entrepreneurship, Management, Economics', UNISTR('\D83D\DCBC'), 6);
+VALUES (6, 'Business', 'Entrepreneurship, Management, Economics', 'Business', 6);
 
 INSERT INTO CATEGORY (CATEGORY_ID, CATEGORY_NAME, DESCRIPTION, ICON, DISPLAY_ORDER)
-VALUES (7, 'Bangla Literature', 'Bengali Language and Culture', UNISTR('\D83C\DDE7\D83C\DDE9'), 7);
+VALUES (7, 'Bangla Literature', 'Bengali Language and Culture', 'Bangla Literature', 7);
 
 COMMIT;
 
@@ -161,7 +76,6 @@ COMMIT;
 -- STEP 4: SAMPLE BOOK-CATEGORY ASSOCIATIONS
 -- ─────────────────────────────────────────────────────────────────────────
 
--- Sample: Associate first book with Fiction and Bangla Literature
 INSERT INTO BOOK_CATEGORY (BOOK_CATEGORY_ID, BOOK_ID, CATEGORY_ID)
 SELECT 1, b.BOOK_ID, 1 FROM BOOK b WHERE b.BOOK_ID = 
     (SELECT MIN(BOOK_ID) FROM BOOK WHERE ROWNUM = 1);
@@ -173,8 +87,8 @@ COMMIT;
 -- ─────────────────────────────────────────────────────────────────────────
 
 -- ─────────────────────────────────────────────────────────────────────────
--- VIEW 1: FEATURED_BOOKS
--- Shows top 8 highest-rated books (Lab 04: ORDER BY, LIMIT equivalent)
+-- VIEW 1: FEATURED_BOOKS_VIEW
+-- Shows the highest-rated books currently in stock (Lab 04: ORDER BY)
 -- ─────────────────────────────────────────────────────────────────────────
 
 CREATE OR REPLACE VIEW FEATURED_BOOKS_VIEW AS
@@ -186,21 +100,16 @@ SELECT
     b.REVIEW_COUNT,
     b.STOCK_QUANTITY,
     a.AUTHOR_NAME,
-    p.PUBLISHER_NAME,
-    LISTAGG(c.CATEGORY_NAME, ', ') WITHIN GROUP (ORDER BY c.CATEGORY_NAME) AS CATEGORIES
+    p.PUBLISHER_NAME
 FROM BOOK b
 LEFT JOIN AUTHOR a ON b.AUTHOR_ID = a.AUTHOR_ID
 LEFT JOIN PUBLISHER p ON b.PUBLISHER_ID = p.PUBLISHER_ID
-LEFT JOIN BOOK_CATEGORY bc ON b.BOOK_ID = bc.BOOK_ID
-LEFT JOIN CATEGORY c ON bc.CATEGORY_ID = c.CATEGORY_ID
 WHERE b.STOCK_QUANTITY > 0 AND b.STAR_RATING >= 3.5
-GROUP BY b.BOOK_ID, b.TITLE, b.PRICE, b.STAR_RATING, b.REVIEW_COUNT, 
-         b.STOCK_QUANTITY, a.AUTHOR_NAME, p.PUBLISHER_NAME
 ORDER BY b.STAR_RATING DESC, b.REVIEW_COUNT DESC;
 
 -- ─────────────────────────────────────────────────────────────────────────
 -- VIEW 2: BEST_SELLERS_VIEW
--- Uses GROUP BY and aggregate functions (Lab 04: GROUP BY, COUNT)
+-- Uses GROUP BY and aggregate functions (Lab 04: GROUP BY, COUNT, HAVING)
 -- ─────────────────────────────────────────────────────────────────────────
 
 CREATE OR REPLACE VIEW BEST_SELLERS_VIEW AS
@@ -224,7 +133,7 @@ ORDER BY TOTAL_QUANTITY_SOLD DESC;
 
 -- ─────────────────────────────────────────────────────────────────────────
 -- VIEW 3: NEW_ARRIVALS_VIEW
--- Uses date functions (Lab 10: SYSDATE, TRUNC)
+-- Most recently added books in stock
 -- ─────────────────────────────────────────────────────────────────────────
 
 CREATE OR REPLACE VIEW NEW_ARRIVALS_VIEW AS
@@ -245,7 +154,7 @@ ORDER BY b.BOOK_ID DESC;
 
 -- ─────────────────────────────────────────────────────────────────────────
 -- VIEW 4: CATEGORY_BOOKS_VIEW
--- Uses JOIN to connect books with categories (Lab 06: JOIN with category)
+-- Books joined with their category (Lab 06: JOIN)
 -- ─────────────────────────────────────────────────────────────────────────
 
 CREATE OR REPLACE VIEW CATEGORY_BOOKS_VIEW AS
@@ -269,7 +178,7 @@ ORDER BY c.DISPLAY_ORDER, b.STAR_RATING DESC;
 
 -- ─────────────────────────────────────────────────────────────────────────
 -- VIEW 5: HIGH_RATED_BOOKS_VIEW (Lab 04: HAVING clause with aggregates)
--- Shows books with average rating >= 4.0 and at least 3 reviews
+-- Books with average rating >= 4.0 and at least 3 reviews
 -- ─────────────────────────────────────────────────────────────────────────
 
 CREATE OR REPLACE VIEW HIGH_RATED_BOOKS_VIEW AS
@@ -293,7 +202,7 @@ ORDER BY AVERAGE_RATING DESC;
 
 -- ─────────────────────────────────────────────────────────────────────────
 -- VIEW 6: CATEGORY_SUMMARY_VIEW (Lab 04: GROUP BY with COUNT/SUM)
--- Shows category statistics
+-- Per-category statistics
 -- ─────────────────────────────────────────────────────────────────────────
 
 CREATE OR REPLACE VIEW CATEGORY_SUMMARY_VIEW AS
@@ -316,7 +225,7 @@ ORDER BY c.DISPLAY_ORDER;
 
 -- ─────────────────────────────────────────────────────────────────────────
 -- VIEW 7: AUTHOR_BOOK_COUNT_VIEW (Lab 04: GROUP BY with aggregate)
--- Shows authors and their book count
+-- Authors and their book count
 -- ─────────────────────────────────────────────────────────────────────────
 
 CREATE OR REPLACE VIEW AUTHOR_BOOK_COUNT_VIEW AS

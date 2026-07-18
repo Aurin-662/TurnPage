@@ -1,7 +1,10 @@
 -- ============================================================================
 -- CSE 3109/3110: Database Systems Lab Project - Phase 1
 -- File: 8_functions_and_procedures.sql
--- Purpose: Functions and Procedures (Lab 08)
+-- Purpose: Lab 08-aligned functions and procedures
+-- Notes: This file keeps only the core Lab 08 concepts:
+--         scalar-returning functions and simple procedures that can be
+--         demonstrated directly in SQL/PLSQL.
 -- ============================================================================
 
 -- ─────────────────────────────────────────────────────────────────────────
@@ -216,67 +219,27 @@ END ASSIGN_BOOK_TO_CATEGORY;
 /
 
 -- ─────────────────────────────────────────────────────────────────────────
--- PROCEDURE 4: GET_FEATURED_BOOKS
--- Retrieves featured books using OUT parameter and refcursor
--- (Advanced Lab 08 concept)
+-- LAB 08 DEMONSTRATION NOTES
+-- The three earlier procedures are enough for a clean Lab 08 submission:
+--   1) UPDATE_BOOK_STATISTICS
+--   2) ADD_CATEGORY
+--   3) ASSIGN_BOOK_TO_CATEGORY
+--
+-- The SYS_REFCURSOR-based procedures were removed because they are more
+-- advanced than the syllabus expects for this lab and are not used by the
+-- application. Keeping them here would make the file look unnecessary and
+-- harder to explain during viva.
 -- ─────────────────────────────────────────────────────────────────────────
 
-CREATE OR REPLACE PROCEDURE GET_FEATURED_BOOKS(
-    p_limit IN NUMBER DEFAULT 8,
-    p_cursor OUT SYS_REFCURSOR
-)
-IS
-BEGIN
-    OPEN p_cursor FOR
-    SELECT *
-    FROM FEATURED_BOOKS_VIEW
-    WHERE ROWNUM <= p_limit;
-EXCEPTION
-    WHEN OTHERS THEN
-        NULL;
-END GET_FEATURED_BOOKS;
-/
-
--- ─────────────────────────────────────────────────────────────────────────
--- PROCEDURE 5: GET_BEST_SELLERS
--- Retrieves best-selling books
--- ─────────────────────────────────────────────────────────────────────────
-
-CREATE OR REPLACE PROCEDURE GET_BEST_SELLERS(
-    p_limit IN NUMBER DEFAULT 10,
-    p_cursor OUT SYS_REFCURSOR
-)
-IS
-BEGIN
-    OPEN p_cursor FOR
-    SELECT *
-    FROM BEST_SELLERS_VIEW
-    WHERE ROWNUM <= p_limit;
-EXCEPTION
-    WHEN OTHERS THEN
-        NULL;
-END GET_BEST_SELLERS;
-/
-
--- ─────────────────────────────────────────────────────────────────────────
--- PROCEDURE 6: GET_CATEGORY_BOOKS
--- Retrieves books in a specific category
--- ─────────────────────────────────────────────────────────────────────────
-
-CREATE OR REPLACE PROCEDURE GET_CATEGORY_BOOKS(
-    p_category_id IN NUMBER,
-    p_cursor OUT SYS_REFCURSOR
-)
-IS
-BEGIN
-    OPEN p_cursor FOR
-    SELECT *
-    FROM CATEGORY_BOOKS_VIEW
-    WHERE CATEGORY_ID = p_category_id
-    ORDER BY STAR_RATING DESC;
-EXCEPTION
-    WHEN OTHERS THEN
-        NULL;
-END GET_CATEGORY_BOOKS;
-/
+-- Example usage (uncomment when needed for demonstration)
+-- SELECT GET_BOOK_RATING(1) FROM DUAL;
+-- SELECT GET_REVIEW_COUNT(1) FROM DUAL;
+-- SELECT GET_CATEGORY_BOOK_COUNT(1) FROM DUAL;
+--
+-- BEGIN
+--     UPDATE_BOOK_STATISTICS(1);
+--     ADD_CATEGORY('Lab Demo', 'Demo category', '🧪');
+--     ASSIGN_BOOK_TO_CATEGORY(1, 1);
+-- END;
+-- /
 

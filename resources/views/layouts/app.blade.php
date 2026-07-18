@@ -108,6 +108,9 @@
                     <li class="nav-item">
                         <a class="nav-link {{ request()->routeIs('authors.*') ? 'active' : '' }}" href="{{ route('authors.index') }}">Authors</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->routeIs('publishers.*') ? 'active' : '' }}" href="{{ route('publishers.index') }}">Publishers</a>
+                    </li>
                 </ul>
 
                 <ul class="navbar-nav ms-auto align-items-center gap-1">

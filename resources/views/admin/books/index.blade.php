@@ -18,7 +18,7 @@
         </div>
         <div class="d-flex gap-2 w-100 w-md-auto">
             <form action="{{ route('admin.books.index') }}" method="GET" class="d-flex gap-2 w-100">
-                <input type="search" name="search" class="form-control form-control-sm" placeholder="Search books..." value="{{ $search ?? request('search') }}">
+                <input type="search" name="search" class="form-control form-control-sm" placeholder="Search books..." value="{{ request('search') }}">
                 <button type="submit" class="btn btn-dark btn-sm">Search</button>
             </form>
             <a href="{{ route('admin.books.index') }}" class="btn btn-outline-secondary btn-sm">Reset</a>
