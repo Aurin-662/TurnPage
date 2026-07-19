@@ -1,20 +1,11 @@
--- ============================================================================
--- CSE 3109/3110: Database Systems Lab Project - Phase 1
--- File: 7_categories_and_views.sql
--- Purpose: Categories, Book-Category relationships, and Views (Labs 02-05)
--- ============================================================================
+-- Categories, Book-Category relationships, and Views (Labs 02-05)
 
--- ─────────────────────────────────────────────────────────────────────────
--- CLEANUP: drop the category tables from the earlier run so they can be
--- rebuilt cleanly (also drops BOOK_CATEGORY first since it references
--- CATEGORY and BOOK).
--- ─────────────────────────────────────────────────────────────────────────
 
 DROP TABLE BOOK_CATEGORY CASCADE CONSTRAINTS;
 DROP TABLE CATEGORY CASCADE CONSTRAINTS;
 
 -- ─────────────────────────────────────────────────────────────────────────
--- STEP 1: CREATE CATEGORY TABLE (Lab 02: DDL - CREATE TABLE)
+-- STEP 1: CREATE CATEGORY TABLE 
 -- ─────────────────────────────────────────────────────────────────────────
 
 CREATE TABLE CATEGORY (
@@ -30,7 +21,7 @@ CREATE TABLE CATEGORY (
 );
 
 -- ─────────────────────────────────────────────────────────────────────────
--- STEP 2: CREATE BOOK_CATEGORY JUNCTION TABLE (Lab 03: Foreign Keys)
+-- STEP 2: CREATE BOOK_CATEGORY JUNCTION TABLE 
 -- ─────────────────────────────────────────────────────────────────────────
 
 CREATE TABLE BOOK_CATEGORY (
@@ -46,7 +37,7 @@ CREATE TABLE BOOK_CATEGORY (
 );
 
 -- ─────────────────────────────────────────────────────────────────────────
--- STEP 3: INSERT SAMPLE CATEGORIES (Lab 02: DML - INSERT)
+-- STEP 3: INSERT SAMPLE CATEGORIES
 -- ─────────────────────────────────────────────────────────────────────────
 
 INSERT INTO CATEGORY (CATEGORY_ID, CATEGORY_NAME, DESCRIPTION, ICON, DISPLAY_ORDER)
@@ -72,9 +63,6 @@ VALUES (7, 'Bangla Literature', 'Bengali Language and Culture', 'Bangla Literatu
 
 COMMIT;
 
--- ─────────────────────────────────────────────────────────────────────────
--- STEP 4: SAMPLE BOOK-CATEGORY ASSOCIATIONS
--- ─────────────────────────────────────────────────────────────────────────
 
 INSERT INTO BOOK_CATEGORY (BOOK_CATEGORY_ID, BOOK_ID, CATEGORY_ID)
 SELECT 1, b.BOOK_ID, 1 FROM BOOK b WHERE b.BOOK_ID = 
@@ -82,14 +70,8 @@ SELECT 1, b.BOOK_ID, 1 FROM BOOK b WHERE b.BOOK_ID =
 
 COMMIT;
 
--- ─────────────────────────────────────────────────────────────────────────
--- STEP 5: CREATE VIEWS (Lab 05: CREATE VIEW)
--- ─────────────────────────────────────────────────────────────────────────
-
--- ─────────────────────────────────────────────────────────────────────────
 -- VIEW 1: FEATURED_BOOKS_VIEW
--- Shows the highest-rated books currently in stock (Lab 04: ORDER BY)
--- ─────────────────────────────────────────────────────────────────────────
+-- Shows the highest-rated books currently in stock 
 
 CREATE OR REPLACE VIEW FEATURED_BOOKS_VIEW AS
 SELECT 
@@ -109,7 +91,6 @@ ORDER BY b.STAR_RATING DESC, b.REVIEW_COUNT DESC;
 
 -- ─────────────────────────────────────────────────────────────────────────
 -- VIEW 2: BEST_SELLERS_VIEW
--- Uses GROUP BY and aggregate functions (Lab 04: GROUP BY, COUNT, HAVING)
 -- ─────────────────────────────────────────────────────────────────────────
 
 CREATE OR REPLACE VIEW BEST_SELLERS_VIEW AS
@@ -133,7 +114,6 @@ ORDER BY TOTAL_QUANTITY_SOLD DESC;
 
 -- ─────────────────────────────────────────────────────────────────────────
 -- VIEW 3: NEW_ARRIVALS_VIEW
--- Most recently added books in stock
 -- ─────────────────────────────────────────────────────────────────────────
 
 CREATE OR REPLACE VIEW NEW_ARRIVALS_VIEW AS
@@ -154,7 +134,6 @@ ORDER BY b.BOOK_ID DESC;
 
 -- ─────────────────────────────────────────────────────────────────────────
 -- VIEW 4: CATEGORY_BOOKS_VIEW
--- Books joined with their category (Lab 06: JOIN)
 -- ─────────────────────────────────────────────────────────────────────────
 
 CREATE OR REPLACE VIEW CATEGORY_BOOKS_VIEW AS
@@ -177,7 +156,7 @@ WHERE c.IS_ACTIVE = 1 AND b.STOCK_QUANTITY > 0
 ORDER BY c.DISPLAY_ORDER, b.STAR_RATING DESC;
 
 -- ─────────────────────────────────────────────────────────────────────────
--- VIEW 5: HIGH_RATED_BOOKS_VIEW (Lab 04: HAVING clause with aggregates)
+-- VIEW 5: HIGH_RATED_BOOKS_VIEW
 -- Books with average rating >= 4.0 and at least 3 reviews
 -- ─────────────────────────────────────────────────────────────────────────
 
@@ -201,8 +180,7 @@ HAVING COUNT(r.REVIEW_ID) >= 3 AND AVG(r.RATING) >= 4.0
 ORDER BY AVERAGE_RATING DESC;
 
 -- ─────────────────────────────────────────────────────────────────────────
--- VIEW 6: CATEGORY_SUMMARY_VIEW (Lab 04: GROUP BY with COUNT/SUM)
--- Per-category statistics
+-- VIEW 6: CATEGORY_SUMMARY_VIEW 
 -- ─────────────────────────────────────────────────────────────────────────
 
 CREATE OR REPLACE VIEW CATEGORY_SUMMARY_VIEW AS
@@ -224,8 +202,8 @@ GROUP BY c.CATEGORY_ID, c.CATEGORY_NAME, c.ICON, c.DISPLAY_ORDER
 ORDER BY c.DISPLAY_ORDER;
 
 -- ─────────────────────────────────────────────────────────────────────────
--- VIEW 7: AUTHOR_BOOK_COUNT_VIEW (Lab 04: GROUP BY with aggregate)
--- Authors and their book count
+-- VIEW 7: AUTHOR_BOOK_COUNT_VIEW
+
 -- ─────────────────────────────────────────────────────────────────────────
 
 CREATE OR REPLACE VIEW AUTHOR_BOOK_COUNT_VIEW AS

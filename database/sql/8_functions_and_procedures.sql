@@ -1,16 +1,7 @@
--- ============================================================================
--- CSE 3109/3110: Database Systems Lab Project - Phase 1
--- File: 8_functions_and_procedures.sql
--- Purpose: Lab 08-aligned functions and procedures
--- Notes: This file keeps only the core Lab 08 concepts:
---         scalar-returning functions and simple procedures that can be
---         demonstrated directly in SQL/PLSQL.
--- ============================================================================
 
 -- ─────────────────────────────────────────────────────────────────────────
 -- FUNCTION 1: GET_BOOK_RATING
 -- Returns the average rating of a book based on reviews
--- (Lab 08: FUNCTION with RETURN)
 -- ─────────────────────────────────────────────────────────────────────────
 
 CREATE OR REPLACE FUNCTION GET_BOOK_RATING(p_book_id IN NUMBER)
@@ -60,7 +51,6 @@ END GET_REVIEW_COUNT;
 -- ─────────────────────────────────────────────────────────────────────────
 -- FUNCTION 3: GET_SALES_COUNT
 -- Returns total quantity sold for a book
--- (Lab 08: Using aggregate function in procedure)
 -- ─────────────────────────────────────────────────────────────────────────
 
 CREATE OR REPLACE FUNCTION GET_SALES_COUNT(p_book_id IN NUMBER)
@@ -125,7 +115,6 @@ END GET_CATEGORY_BOOK_COUNT;
 -- ─────────────────────────────────────────────────────────────────────────
 -- PROCEDURE 1: UPDATE_BOOK_STATISTICS
 -- Updates STAR_RATING and REVIEW_COUNT in BOOK table
--- (Lab 08: PROCEDURE with multiple operations)
 -- ─────────────────────────────────────────────────────────────────────────
 
 CREATE OR REPLACE PROCEDURE UPDATE_BOOK_STATISTICS(
@@ -159,7 +148,6 @@ END UPDATE_BOOK_STATISTICS;
 -- ─────────────────────────────────────────────────────────────────────────
 -- PROCEDURE 2: ADD_CATEGORY
 -- Adds a new book category
--- (Lab 08: PROCEDURE with INSERT)
 -- ─────────────────────────────────────────────────────────────────────────
 
 CREATE OR REPLACE PROCEDURE ADD_CATEGORY(
@@ -217,29 +205,4 @@ EXCEPTION
         NULL;
 END ASSIGN_BOOK_TO_CATEGORY;
 /
-
--- ─────────────────────────────────────────────────────────────────────────
--- LAB 08 DEMONSTRATION NOTES
--- The three earlier procedures are enough for a clean Lab 08 submission:
---   1) UPDATE_BOOK_STATISTICS
---   2) ADD_CATEGORY
---   3) ASSIGN_BOOK_TO_CATEGORY
---
--- The SYS_REFCURSOR-based procedures were removed because they are more
--- advanced than the syllabus expects for this lab and are not used by the
--- application. Keeping them here would make the file look unnecessary and
--- harder to explain during viva.
--- ─────────────────────────────────────────────────────────────────────────
-
--- Example usage (uncomment when needed for demonstration)
--- SELECT GET_BOOK_RATING(1) FROM DUAL;
--- SELECT GET_REVIEW_COUNT(1) FROM DUAL;
--- SELECT GET_CATEGORY_BOOK_COUNT(1) FROM DUAL;
---
--- BEGIN
---     UPDATE_BOOK_STATISTICS(1);
---     ADD_CATEGORY('Lab Demo', 'Demo category', '🧪');
---     ASSIGN_BOOK_TO_CATEGORY(1, 1);
--- END;
--- /
 

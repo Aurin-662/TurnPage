@@ -1,14 +1,3 @@
--- ============================================================================
--- CSE 3109/3110: Database Systems Lab Project - Phase 1
--- File: 9_triggers_advanced.sql
--- Purpose: Database Triggers (Lab 09)
--- ============================================================================
-
--- ─────────────────────────────────────────────────────────────────────────
--- CLEANUP: remove triggers from the earlier (overbuilt) version that are
--- no longer part of this file — duplicate rating trigger, empty/no-op
--- triggers, and the two price triggers merged into one below.
--- ─────────────────────────────────────────────────────────────────────────
 
 DROP TRIGGER UPDATE_RATING_AFTER_REVIEW;
 DROP TRIGGER VALIDATE_BOOK_PRICE_INS;
@@ -19,9 +8,7 @@ DROP TRIGGER AUTO_UPDATE_CART_TOTAL;
 
 -- ─────────────────────────────────────────────────────────────────────────
 -- TRIGGER 1: VALIDATE_BOOK_PRICE
--- Validates book price is within acceptable range, on both INSERT and
--- UPDATE (merged from two separate triggers into one).
--- (Lab 09: BEFORE INSERT OR UPDATE ROW-level TRIGGER, RAISE_APPLICATION_ERROR)
+-- Validates book price is within acceptable range, on both INSERT and UPDATE
 -- ─────────────────────────────────────────────────────────────────────────
 
 CREATE OR REPLACE TRIGGER VALIDATE_BOOK_PRICE
@@ -70,9 +57,7 @@ END VALIDATE_STAR_RATING;
 
 -- ─────────────────────────────────────────────────────────────────────────
 -- TRIGGER 4: VALIDATE_REVIEW_RATING
--- Validates that review rating is between 1 and 5, and the review date
--- is not in the future.
--- (Lab 09: Validating inserted data)
+-- Validates that review rating is between 1 and 5, and the review date is not in the future.
 -- ─────────────────────────────────────────────────────────────────────────
 
 CREATE OR REPLACE TRIGGER VALIDATE_REVIEW_RATING
